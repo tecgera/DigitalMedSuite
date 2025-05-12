@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - DigitalMedSuite</title>
+
+  <link rel="stylesheet" href="/frontend/css/stylesIndex.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Agregando el script de Iconify -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+<body>
+  <div class="login-page">
+    <!-- Panel izquierdo (decorativo) -->
+    <div class="left-panel">
+      <div class="brand">
+        <img src="/frontend/assets/images/logo.png" alt="Logo" class="logo">
+        <h1>DigitalMedSuite</h1>
+      </div>
+      
+      <div class="backlog-image">
+        <img src="/frontend/assets/images/backlog.png" alt="Backlog" class="backlog">
+      </div>
+      
+      <div class="slogan">
+        <h2>Gestión médica simplificada</h2>
+        <p>Optimice su consulta médica con nuestra solución integral</p>
+      </div>
+    </div>
+
+    <!-- Panel derecho (formulario) -->
+    <div class="right-panel">
+      <div class="login-container">
+        <div class="login-header">
+          <h2>Iniciar Sesión</h2>
+          <p>Ingrese sus credenciales para continuar</p>
+        </div>
+
+        <form class="login-form">
+          <div class="input-group">
+            <label for="email">Correo Electrónico</label>
+            <div class="input-with-icon">
+              <iconify-icon icon="mdi:email-outline" class="input-icon"></iconify-icon>
+              <input type="email" id="email" placeholder="nombre@ejemplo.com" required>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="password">Contraseña</label>
+            <div class="input-with-icon">
+              <iconify-icon icon="mdi:lock-outline" class="input-icon"></iconify-icon>
+              <input type="password" id="password" placeholder="Introduzca su contraseña" required>
+              <iconify-icon icon="mdi:eye-off-outline" id="toggleIcon" class="eye-icon" onclick="togglePassword()"></iconify-icon>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <div class="remember-me">
+              <input type="checkbox" id="remember">
+              <label for="remember">Recordarme</label>
+            </div>
+            <a href="forgotPassword.html" class="forgot">¿Olvidó su contraseña?</a>
+          </div>
+
+          <button type="button" id="submit" class="login-btn">Iniciar Sesión</button>
+          
+          <div class="register-option">
+            <p>¿No tiene una cuenta? <a href="register.html">Regístrese aquí</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/scriptIndex.js"></script>
+</body>
+</html>

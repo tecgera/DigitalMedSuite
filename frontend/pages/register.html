@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - DigitalMedSuite</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Archivo CSS específico para registro -->
+  <link rel="stylesheet" href="/frontend/css/stylesRegister.css">
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Sección de formulario -->
+    <div class="login-container">
+      <div class="logo-section">
+        <img src="/frontend/assets/images/logo.png" alt="DigitalMedSuite Logo" class="logo">
+        <h1>DigitalMedSuite</h1>
+      </div>
+      
+      <div class="form-section">
+        <h2 class="form-title">Crear una cuenta</h2>
+        <p class="form-subtitle">Complete el formulario para registrarse en el sistema</p>
+        
+        <form id="registerForm" class="login-form">
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:account" class="input-icon"></iconify-icon>
+            <input type="text" id="username" placeholder="Nombre de usuario" required>
+          </div>
+          
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:email" class="input-icon"></iconify-icon>
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+          </div>
+          
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:lock" class="input-icon"></iconify-icon>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <iconify-icon icon="mdi:eye-off" class="toggle-icon" id="toggleIcon" onclick="togglePassword()"></iconify-icon>
+          </div>
+          
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:lock-check" class="input-icon"></iconify-icon>
+            <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="userType">Tipo de usuario:</label>
+            <div class="input-with-icon">
+              <iconify-icon icon="mdi:account-cog" class="input-icon"></iconify-icon>
+              <select id="userType" class="form-control">
+                <option value="Paciente">Paciente</option>
+                <option value="Medico">Médico</option>
+                <option value="Admin">Administrador</option>
+              </select>
+            </div>
+          </div>
+          
+          <button type="button" id="submit" class="login-button">Crear cuenta</button>
+        </form>
+        
+        <div class="form-footer">
+          <p>¿Ya tiene una cuenta? <a href="index.html">Iniciar sesión</a></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección de imagen -->
+    <div class="image-container">
+      <img src="/frontend/assets/images/backlog.png" alt="Medical illustration" class="background-image">
+    </div>
+  </div>
+
+  <script src="/frontend/js/scriptRegister.js"></script>
+</body>
+</html>

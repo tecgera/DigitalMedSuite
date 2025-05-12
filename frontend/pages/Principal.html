@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigitalMedSuite</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/frontend/css/StylesPrincipal.css">
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-section" onclick="toggleMenu()">
+          <img src="/frontend/assets/images/logo.png" alt="Logo" class="logo-img" id="menuLogo">
+          <span class="logo-text">DigitalMedSuite</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-link active" onclick="showPage('home')">
+          <iconify-icon icon="mdi:home" class="nav-icon"></iconify-icon>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('citas')">
+          <iconify-icon icon="mdi:calendar-clock" class="nav-icon"></iconify-icon>
+          <span>Citas</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('pacientes')">
+          <iconify-icon icon="mdi:folder-account" class="nav-icon"></iconify-icon>
+          <span>Pacientes</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('usuarios')">
+          <iconify-icon icon="mdi:account-group" class="nav-icon"></iconify-icon>
+          <span>Usuarios</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" class="logout-btn" id="logoutBtn">
+          <iconify-icon icon="mdi:logout" class="nav-icon"></iconify-icon>
+          <span>Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-area">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="toggleMenu()">
+            <iconify-icon icon="mdi:menu" width="24"></iconify-icon>
+          </button>
+          <div class="page-title">
+            <h1 id="currentPageTitle">Dashboard</h1>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="user-actions">
+            <button class="icon-btn theme-toggle-btn" id="themeToggle">
+              <iconify-icon icon="mdi:moon-waning-crescent" width="22" id="themeIcon"></iconify-icon>
+            </button>
+            <button class="icon-btn notification-btn">
+              <iconify-icon icon="mdi:bell-outline" width="22"></iconify-icon>
+              <span class="badge">3</span>
+            </button>
+            <div class="user-profile">
+              <img src="https://ui-avatars.com/api/?name=Usuario&background=8e2de2&color=fff" alt="Profile" class="avatar">
+              <span class="user-name" id="userName">Dr. Usuario</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Dashboard Page -->
+        <section id="home" class="page active">
+          <!-- Dashboard Stats -->
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-icon patients">
+                <iconify-icon icon="mdi:account-multiple" width="24"></iconify-icon>
+              </div>
+              <div class="stat-details">
+                <h3>25</h3>
+                <p>Pacientes Registrados</p>
+              </div>
+              <div class="stat-progress">
+                <span>+5% vs. mes pasado</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon appointments">
+                <iconify-icon icon="mdi:calendar-check" width="24"></iconify-icon>
+              </div>
+              <div class="stat-details">
+                <h3>8</h3>
+                <p>Citas Hoy</p>
+              </div>
+              <div class="stat-progress">
+                <span>2 completadas</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon records">
+                <iconify-icon icon="mdi:file-document-edit" width="24"></iconify-icon>
+              </div>
+              <div class="stat-details">
+                <h3>3</h3>
+                <p>Expedientes Actualizados</p>
+              </div>
+              <div class="stat-progress">
+                <span>Hoy</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon alerts">
+                <iconify-icon icon="mdi:alert-circle" width="24"></iconify-icon>
+              </div>
+              <div class="stat-details">
+                <h3>2</h3>
+                <p>Citas no Honradas</p>
+              </div>
+              <div class="stat-progress">
+                <span>Pendiente contacto</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard Content -->
+          <div class="dashboard-grid">
+            <!-- Today's Appointments -->
+            <div class="dashboard-card today-appointments">
+              <div class="card-header">
+                <h2>
+                  <iconify-icon icon="mdi:calendar-today" class="card-icon"></iconify-icon>
+                  Citas de Hoy
+                </h2>
+                <button class="card-action">
+                  <iconify-icon icon="mdi:dots-vertical" width="20"></iconify-icon>
+                </button>
+              </div>
+              <div class="card-content" id="citasListaHoy">
+                <!-- Las citas se insertarán dinámicamente -->
+                <div class="empty-state">
+                  <iconify-icon icon="mdi:calendar-blank" width="48"></iconify-icon>
+                  <p>No hay citas programadas para hoy</p>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button class="btn primary-btn">
+                  <iconify-icon icon="mdi:calendar-plus"></iconify-icon>
+                  Nueva Cita
+                </button>
+              </div>
+            </div>
+
+            <!-- Calendar Widget -->
+            <div class="dashboard-card calendar-widget">
+              <div class="card-header">
+                <h2>
+                  <iconify-icon icon="mdi:calendar-month" class="card-icon"></iconify-icon>
+                  Calendario
+                </h2>
+              </div>
+              <div class="card-content">
+                <div id="calendar"></div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card quick-actions">
+              <div class="card-header">
+                <h2>
+                  <iconify-icon icon="mdi:flash" class="card-icon"></iconify-icon>
+                  Acciones Rápidas
+                </h2>
+              </div>
+              <div class="card-content">
+                <div class="action-buttons">
+                  <button class="action-btn">
+                    <iconify-icon icon="mdi:calendar-plus" width="24"></iconify-icon>
+                    <span>Nueva Cita</span>
+                  </button>
+                  <button class="action-btn">
+                    <iconify-icon icon="mdi:account-plus" width="24"></iconify-icon>
+                    <span>Registrar Paciente</span>
+                  </button>
+                  <button class="action-btn">
+                    <iconify-icon icon="mdi:folder-open" width="24"></iconify-icon>
+                    <span>Ver Expedientes</span>
+                  </button>
+                  <button class="action-btn">
+                    <iconify-icon icon="mdi:file-document-edit" width="24"></iconify-icon>
+                    <span>Actualizar Expediente</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="dashboard-card recent-activity">
+              <div class="card-header">
+                <h2>
+                  <iconify-icon icon="mdi:clock-time-eight" class="card-icon"></iconify-icon>
+                  Actividad Reciente
+                </h2>
+              </div>
+              <div class="card-content">
+                <ul class="activity-list">
+                  <li class="activity-item">
+                    <div class="activity-icon update">
+                      <iconify-icon icon="mdi:file-document-edit" width="16"></iconify-icon>
+                    </div>
+                    <div class="activity-details">
+                      <p>Actualización de expediente: <strong>Juan Pérez</strong></p>
+                      <span class="activity-time">Hace 35 minutos</span>
+                    </div>
+                  </li>
+                  <li class="activity-item">
+                    <div class="activity-icon appointment">
+                      <iconify-icon icon="mdi:calendar-check" width="16"></iconify-icon>
+                    </div>
+                    <div class="activity-details">
+                      <p>Cita completada: <strong>María González</strong></p>
+                      <span class="activity-time">Hace 2 horas</span>
+                    </div>
+                  </li>
+                  <li class="activity-item">
+                    <div class="activity-icon new">
+                      <iconify-icon icon="mdi:account-plus" width="16"></iconify-icon>
+                    </div>
+                    <div class="activity-details">
+                      <p>Nuevo paciente registrado: <strong>Carlos Ramírez</strong></p>
+                      <span class="activity-time">Hoy, 9:15 AM</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="card-footer">
+                <a href="#" class="view-all">Ver todas las actividades</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="citas" class="page">
+          <div class="section-header">
+            <h2>Gestión de Citas</h2>
+            <div class="section-actions">
+              <button class="btn primary-btn" id="btnNuevaCita">
+                <iconify-icon icon="mdi:calendar-plus"></iconify-icon>
+                Nueva Cita
+              </button>
+            </div>
+          </div>
+
+          <div class="appointments-grid">
+            <!-- Filter Panel -->
+            <div class="filter-panel">
+              <div class="date-filters">
+                <button class="filter-btn active" data-filtro="hoy">Hoy</button>
+                <button class="filter-btn" data-filtro="manana">Mañana</button>
+                <button class="filter-btn" data-filtro="semana">Esta semana</button>
+              </div>
+              <div class="search-filters">
+                <div class="filter-options">
+                  <label class="filter-option active" data-filtro="paciente">
+                    <input type="radio" name="filterType" checked>
+                    <span>Paciente</span>
+                  </label>
+                  <label class="filter-option" data-filtro="medico">
+                    <input type="radio" name="filterType">
+                    <span>Médico</span>
+                  </label>
+                </div>
+                <div class="search-input">
+                  <iconify-icon icon="mdi:magnify" class="search-icon"></iconify-icon>
+                  <input type="text" id="busquedaCita" placeholder="Buscar por nombre...">
+                </div>
+              </div>
+            </div>
+
+            <!-- Appointments List -->
+            <div class="appointments-list" id="listaCitas">
+              <!-- Las citas se insertarán dinámicamente aquí -->
+              <div class="empty-state">
+                <iconify-icon icon="mdi:calendar-blank" width="48"></iconify-icon>
+                <p>No hay citas programadas para este período</p>
+              </div>
+            </div>
+
+            <!-- Appointment Details -->
+            <div class="appointment-details" id="resultadoCita">
+              <!-- Aquí se mostrará la cita seleccionada -->
+              <div class="empty-state">
+                <iconify-icon icon="mdi:calendar-search" width="48"></iconify-icon>
+                <p>Seleccione una cita para ver los detalles</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-footer">
+            <button class="btn secondary-btn" id="btnModificarCita" disabled>
+              <iconify-icon icon="mdi:pencil"></iconify-icon>
+              Modificar
+            </button>
+          </div>
+        </section>
+
+        <!-- Patients Section -->
+        <section id="pacientes" class="page">
+          <div class="section-header">
+            <h2>Gestión de Pacientes</h2>
+            <div class="section-actions">
+              <button class="btn primary-btn">
+                <iconify-icon icon="mdi:account-plus"></iconify-icon>
+                Nuevo Paciente
+              </button>
+            </div>
+          </div>
+
+          <div class="patients-grid">
+            <!-- Content will be added in future iterations -->
+            <div class="empty-state">
+              <iconify-icon icon="mdi:folder-account" width="64"></iconify-icon>
+              <p>Lista de expedientes clínicos en desarrollo</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="usuarios" class="page">
+          <div class="section-header">
+            <h2>Gestión de Usuarios</h2>
+            <div class="section-actions">
+              <button class="btn primary-btn">
+                <iconify-icon icon="mdi:account-plus"></iconify-icon>
+                Nuevo Usuario
+              </button>
+            </div>
+          </div>
+
+          <div class="users-grid">
+            <!-- Content will be added in future iterations -->
+            <div class="empty-state">
+              <iconify-icon icon="mdi:account-group" width="64"></iconify-icon>
+              <p>Gestión de usuarios del sistema en desarrollo</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="/frontend/js/scriptPrincipal.js"></script>
+  <script src="/frontend/js/scriptCitas.js"></script>
+</body>
+</html>
