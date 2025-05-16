@@ -218,12 +218,13 @@ body {
   transition: transform 0.3s ease;
 }
 
+
 .input-with-icon:focus-within {
   transform: translateY(-2px);
 }
 
-.input-icon {
-  position: absolute;
+.input-icon  {
+  position:absolute;
   left: 1.2rem;
   top: 50%;
   transform: translateY(-50%);
@@ -231,6 +232,15 @@ body {
   font-size: 1.3rem;
   transition: color 0.3s ease;
 }
+
+.input-with-icon:has(.error-message) .input-icon {
+  top:27%
+}
+.input-with-icon:has(.error-message) .eye-icon {
+  top:27%
+}
+
+
 
 .eye-icon {
   position: absolute;
@@ -280,7 +290,7 @@ input::placeholder {
   box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1) !important;
 }
 
-.error-message {
+.error-message{
   color: var(--danger-color);
   font-size: 0.85rem;
   margin-top: 0.5rem;

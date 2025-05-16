@@ -816,7 +816,25 @@ ul, ol {
   gap: 24px;
 }
 
-.dashboard-card {
+.today-appointments{
+   background: var(--card-bg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  height: 800 PX;
+  width: 800 PX;
+  overflow-y: auto;
+}
+#citasListaHoy {
+  max-height: 550px; 
+  overflow-y: auto;
+  padding-right: 0.5rem; 
+}
+.dashboard-card, .bitacora-card{
   background: var(--card-bg);
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-sm);
@@ -1237,6 +1255,7 @@ ul, ol {
   background: var(--secondary-color);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
+  margin-right: 5%;
 }
 
 .secondary-btn:hover {
@@ -1994,6 +2013,7 @@ body,
   }
 
 
+  
   /* Calendario responsivo */
 #calendar {
   width: 100%;
@@ -2054,13 +2074,34 @@ body,
   /*-----------------------------------------------------------------------Fin Seccion Principal-----------------------------------------------------------------------*/
   /*-----------------------------------------------------------------------Seccion Citas-------------------------------------------------------------------------------*/
 
-  /* Contenedor general del módulo */
-.modulo-citas {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  margin: 30px 0;
-  font-family: 'Poppins', sans-serif;
+  .filter-panel{
+    margin-bottom: 10px;
+  }
+
+.search-input {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  z-index: 1;
+}
+
+.search-input input {
+  width: 100%;
+  padding: 10px 10px 10px 40px; /* IMPORTANTE: espacio a la izquierda para el icono */
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--secondary-color);
+  color: var(--text-primary);
 }
 
 /* ======================== */
@@ -2075,7 +2116,7 @@ body,
   min-width: 320px;
 }
 
-/* Filtros de fecha (Hoy, Mañana, Esta semana) */
+/* Filtros de fecha (Hoy, Mañana, Esta semana) 
 .filtros-fecha {
   display: flex;
   justify-content: space-around;
@@ -2108,6 +2149,7 @@ body,
   height: 2px;
   background: #800080;
 }
+*/
 
 /* Lista de citas (scroll si son muchas) */
 .lista-citas {
@@ -2174,10 +2216,18 @@ body,
 
 #busquedaCita {
   flex: 1;
+  padding-left:40px;
+  border: 2px solid #ccc;
+  border-radius: 8px 0 0 8px;
+  font-size: 1em;
+}
+#busquedaPacientes, #busquedaUsuarios{
+flex: 1;
   padding: 8px 10px;
   border: 2px solid #ccc;
   border-radius: 8px 0 0 8px;
   font-size: 1em;
+  width: 500px;
 }
 
 #btnBuscar {
@@ -2260,3 +2310,93 @@ body,
 }
 
 /*-----------------------------------------------------------------------Fin Seccion Citas-----------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------Pestanias Gestion Hospital---------------------------------------------------------------*/
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+
+
+.tab-btn {
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tab-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-light);
+}
+
+/*-----------------------------------------------------------------------Consultorios---------------------------------------------------------------------------*/
+.estado-circulo {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.disponible {
+  background-color: #2ecc71; /* verde */
+}
+
+.ocupado {
+  background-color: #e74c3c; /* rojo */
+}
+
+.mantenimiento {
+  background-color: #f39c12; /* naranja */
+}
+
+.dado-baja {
+  background-color: #7f8c8d; /* gris */
+}
+
+.filtros-consultorios, .date-filter{
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.filtro-btn, .filtro-fecha {
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.filtro-btn.activo, .filtro-fecha.activo{
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-light);
+}
+
+.pestania-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  align-content: center;
+}
+
+.circle {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}

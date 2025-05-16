@@ -12,7 +12,24 @@
   <link rel="stylesheet" href="/frontend/css/StylesPrincipal.css">
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
   <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+  <!--================================-->
+      <!-- Apartado para el registro -->
+      <!--================================-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - DigitalMedSuite</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Archivo CSS específico para registro -->
+  <link rel="stylesheet" href="/frontend/css/stylesRegister.css">
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </head>
+
+
 <body>
   <div class="app-container">
     <!-- Sidebar -->
@@ -40,6 +57,14 @@
         <a href="#" class="nav-link" onclick="showPage('usuarios')">
           <iconify-icon icon="mdi:account-group" class="nav-icon"></iconify-icon>
           <span>Usuarios</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('bitacora')">
+          <iconify-icon icon="mdi:book-time" class="nav-icon"></iconify-icon>
+          <span>Bitacora</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('hospital')">
+          <iconify-icon icon="mdi:hospital-building" class="nav-icon"></iconify-icon>
+          <span>Hospital</span>
         </a>
       </nav>
 
@@ -138,11 +163,12 @@
               </div>
             </div>
           </div>
-
+          <!--======================-->
           <!-- Dashboard Content -->
+           <!--======================-->
           <div class="dashboard-grid">
             <!-- Today's Appointments -->
-            <div class="dashboard-card today-appointments">
+            <div class="dashboard-card today-appointments" id=" today-appointments">
               <div class="card-header">
                 <h2>
                   <iconify-icon icon="mdi:calendar-today" class="card-icon"></iconify-icon>
@@ -250,13 +276,15 @@
                 </ul>
               </div>
               <div class="card-footer">
-                <a href="#" class="view-all">Ver todas las actividades</a>
+                <a href="#" class="view-all" onclick="showPage('bitacora')">Ver todas las actividades</a>
               </div>
             </div>
           </div>
         </section>
 
+        <!--======================-->
         <!-- Appointments Section -->
+         <!--======================-->
         <section id="citas" class="page">
           <div class="section-header">
             <h2>Gestión de Citas</h2>
@@ -272,9 +300,10 @@
             <!-- Filter Panel -->
             <div class="filter-panel">
               <div class="date-filters">
-                <button class="filter-btn active" data-filtro="hoy">Hoy</button>
-                <button class="filter-btn" data-filtro="manana">Mañana</button>
-                <button class="filter-btn" data-filtro="semana">Esta semana</button>
+                <button class="filtro-fecha activo" data-filtro="todos">Todos</button>
+                <button class="filtro-fecha " data-filtro="hoy">Hoy</button>
+                <button class="filtro-fecha" data-filtro="manana">Mañana</button>
+                <button class="filtro-fecha" data-filtro="semana">Esta semana</button>
               </div>
               <div class="search-filters">
                 <div class="filter-options">
@@ -288,8 +317,8 @@
                   </label>
                 </div>
                 <div class="search-input">
-                  <iconify-icon icon="mdi:magnify" class="search-icon"></iconify-icon>
-                  <input type="text" id="busquedaCita" placeholder="Buscar por nombre...">
+                   <iconify-icon icon="mdi:magnify" class="search-icon"></iconify-icon>
+                   <input type="text" id="busquedaCita" placeholder="Buscar por nombre...">
                 </div>
               </div>
             </div>
@@ -321,52 +350,281 @@
           </div>
         </section>
 
+        <!--======================-->
         <!-- Patients Section -->
-        <section id="pacientes" class="page">
+         <!--======================-->
+         <section id="pacientes" class="page">
           <div class="section-header">
             <h2>Gestión de Pacientes</h2>
             <div class="section-actions">
-              <button class="btn primary-btn">
-                <iconify-icon icon="mdi:account-plus"></iconify-icon>
-                Nuevo Paciente
+              <input type="text" id="busquedaPacientes" placeholder="Buscar por nombre...">
+              <button class="btn primary-btn" id="btnRegistrarPaciente">
+                <iconify-icon icon="mdi:account-multiple-plus"></iconify-icon>
+                Registrar Paciente
               </button>
             </div>
           </div>
 
-          <div class="patients-grid">
-            <!-- Content will be added in future iterations -->
-            <div class="empty-state">
-              <iconify-icon icon="mdi:folder-account" width="64"></iconify-icon>
-              <p>Lista de expedientes clínicos en desarrollo</p>
+          
+
+            <!-- pacientes List -->
+            <div class="appointments-list" id="listaPacientes">
+              <!-- Los pacientes se insertarán dinámicamente aquí -->
+              <div class="empty-state">
+                <iconify-icon icon="material-symbols:clinical-notes-rounded" width="48"></iconify-icon>
+                <p>No hay pacientes registrados </p>
+              </div>
             </div>
+
+            <!-- Patients Details -->
+            <div class="appointment-details" id="resultadoPacientes">
+              <!-- Aquí se mostrará los detalles del paciente seleccionado -->
+              <div class="empty-state">
+                <iconify-icon icon="material-symbols:clinical-notes-outline-rounded" width="48"></iconify-icon>
+                <p>Seleccione un paciente para ver los detalles</p>
+              </div>
+            </div>
+              <div class="section-footer">
+            <button class="btn secondary-btn" id="btnModificarPaciente" disabled>
+              <iconify-icon icon="mdi:pencil"></iconify-icon>
+              Modificar
+            </button>
           </div>
         </section>
 
-        <!-- Users Section -->
+         <!--=======================-->
+          <!-- Users Section -->
+          <!--=======================-->
         <section id="usuarios" class="page">
           <div class="section-header">
             <h2>Gestión de Usuarios</h2>
             <div class="section-actions">
-              <button class="btn primary-btn">
-                <iconify-icon icon="mdi:account-plus"></iconify-icon>
-                Nuevo Usuario
+              <input type="text" id="busquedaUsuarios" placeholder="Buscar por nombre...">
+              <button class="btn primary-btn" id="btnRegistrarUsuario"onclick="showPage('registro')">
+                <iconify-icon icon="mdi:account-multiple-plus"></iconify-icon>
+                Registrar Usuario
               </button>
+            
             </div>
           </div>
 
-          <div class="users-grid">
-            <!-- Content will be added in future iterations -->
-            <div class="empty-state">
-              <iconify-icon icon="mdi:account-group" width="64"></iconify-icon>
-              <p>Gestión de usuarios del sistema en desarrollo</p>
+          
+
+            <!-- Users List -->
+            <div class="appointments-list" id="listaUsuario">
+              <!-- Los pacientes se insertarán dinámicamente aquí -->
+              <div class="empty-state">
+                <iconify-icon icon="material-symbols:clinical-notes-rounded" width="48"></iconify-icon>
+                <p>No hay usuarios registrados </p>
+              </div>
             </div>
+
+            <!-- Appointment Details -->
+            <div class="appointment-details" id="resultadoUsuario">
+              <!-- Aquí se mostrará los detalles del paciente seleccionado -->
+              <div class="empty-state">
+                <iconify-icon icon="material-symbols:clinical-notes-outline-rounded" width="48"></iconify-icon>
+                <p>Seleccione un Usuario para ver los detalles</p>
+              </div>
+            </div>
+              <div class="section-footer">
+            <button class="btn secondary-btn" id="btnModificarUsuario" disabled>
+              <iconify-icon icon="mdi:pencil"></iconify-icon>
+              Modificar
+            </button>
           </div>
         </section>
+
+        <!--======================-->
+        <!-- Gestion de Bitacora -->
+        <!--======================-->
+        <section id="bitacora" class="page">
+          <div class="section-header">
+                <h2>Gestión del Bitácora</h2>
+            <div class="section-actions">
+            <!-- Acciones futuras -->
+            </div>
+          </div>
+
+  <!-- Contenido dinámico generado por JS -->
+  <div class="bitacora-card">
+    <div class="card-content">
+      <ul class="activity-list" id="listaBitacora">
+        <!-- Elementos se insertarán dinámicamente aquí -->
+        <div class="empty-state">
+          <iconify-icon icon="mdi:note-outline" width="48"></iconify-icon>
+          <p>No hay eventos registrados en la bitácora</p>
+        </div>
+      </ul>
+    </div>
+  </div>
+</section>
+
+         <!--======================-->
+        <!-- Gestion Hospital Section -->
+         <!--======================-->
+        <section id="hospital" class="page">
+  <div class="section-header">
+    <h2>Gestión del Hospital</h2>
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="medicosTab">Médicos</button>
+      <button class="tab-btn" data-tab="consultoriosTab">Consultorios</button>
+    </div>
+  </div>
+
+  <!--======================-->
+  <!-- Gestión de Médicos -->
+  <!--======================-->
+  <div id="medicosTab" class="tab-content active">
+    <div class="pestania-header">
+    <div class="section-actions">
+      <button class="btn primary-btn" id="btnRegistrarMedico">
+        <iconify-icon icon="healthicons:doctor-female"></iconify-icon>
+        Registrar Médico
+      </button>
+    </div>
+  </div>
+    <!-- Lista de médicos -->
+    <div class="appointments-list" id="listaMedicos">
+      <div class="empty-state">
+        <iconify-icon icon="mdi:doctor" width="48"></iconify-icon>
+        <p>No hay médicos registrados</p>
       </div>
+    </div>
+
+    <!-- Detalles del médico seleccionado -->
+    <div class="appointment-details" id="resultadoMedico">
+      <div class="empty-state">
+        <iconify-icon icon="mdi:information-outline" width="48"></iconify-icon>
+        <p>Seleccione un médico para ver los detalles</p>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <button class="btn secondary-btn" id="btnModificarMedico" disabled>
+        <iconify-icon icon="mdi:pencil"></iconify-icon>
+        Modificar
+      </button>
+    </div>
+  </div>
+
+  <!--======================-->
+  <!-- Gestión de Consultorios -->
+  <!--======================-->
+  <div id="consultoriosTab" class="tab-content">
+    <div class="pestania-header">
+    <div class="section-actions">
+      <button class="btn primary-btn" id="btnRegistrarUsuario">
+        <iconify-icon icon="healthicons:hospitalized-24px"></iconify-icon>
+        Nuevo Consultorio
+      </button>
+    </div>
+  </div>
+
+    <div class="filtros-consultorios">
+      <button class="filtro-btn activo" data-estatus="todos">Todos</button>
+      <button class="filtro-btn" data-estatus="Disponible">Disponible</button>
+      <button class="filtro-btn" data-estatus="Ocupado">Ocupado</button>
+      <button class="filtro-btn" data-estatus="En mantenimiento">En mantenimiento</button>
+      <button class="filtro-btn" data-estatus="Dado de baja">Dado de baja</button>
+    </div>
+
+    <!-- Lista de consultorios -->
+    <div class="appointments-list" id="listaConsultorios">
+      <div class="empty-state">
+        <iconify-icon icon="mdi:office-building-outline" width="48"></iconify-icon>
+        <p>No hay consultorios registrados</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+         <!--======================-->
+        <!-- Register user Section -->
+         <!--======================-->
+        <section id="registro" class="page">
+           
+          
+          <div class="container">
+    <!-- Sección de formulario -->
+    <div class="login-container">
+      <div class="logo-section">
+        <img src="/frontend/assets/images/logo.png" alt="DigitalMedSuite Logo" class="logo">
+        <h1 id="head-registro">DigitalMedSuite</h1>
+      </div>
+      <div class="apartadoBoton" id="Apartadobtn">
+              <button class="login-button" id="btnAtrasRegistroUsuario" onclick="showPage('usuarios')">
+                    <iconify-icon icon="mdi:arrow-collapse-left"></iconify-icon>
+                    Atras
+              </button>
+        </div>
+      <div class="form-section">
+        <h2 class="form-title">Crear una cuenta</h2>
+        <p class="form-subtitle">Complete el formulario para registrar un nuevo usuario en el sistema</p>
+        
+        <form id="registerForm" class="login-form">
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:account" class="input-icon"></iconify-icon>
+            <input type="text" id="username" placeholder="Nombre de usuario" required>
+          </div>
+          
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:email" class="input-icon"></iconify-icon>
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+          </div>
+          
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:lock" class="input-icon"></iconify-icon>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <iconify-icon icon="mdi:eye-off" class="toggle-icon" id="toggleIcon" onclick="togglePassword()"></iconify-icon>
+          </div>
+          
+          <div class="input-with-icon">
+            <iconify-icon icon="mdi:lock-check" class="input-icon"></iconify-icon>
+            <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="userType">Tipo de usuario:</label>
+            <div class="input-with-icon">
+              <iconify-icon icon="mdi:account-cog" class="input-icon"></iconify-icon>
+              <select id="userType" class="form-control">
+                <option value="Paciente">Paciente</option>
+                <option value="Medico">Médico</option>
+                <option value="Admin">Administrador</option>
+              </select>
+            </div>
+          </div>
+          
+          <button type="button" id="submit" class="login-button">Crear cuenta</button>
+        </form>
+      
+      </div>
+    </div>
+    
+    <!-- Sección de imagen -->
+    <div class="image-container">
+      <img src="/frontend/assets/images/backlog.png" alt="Medical illustration" class="background-image">
+    </div>
+  </div>
+        </section>
+
+
+         
+
+      </div><!--======================-->
     </main>
   </div>
 
-  <script src="/frontend/js/scriptPrincipal.js"></script>
   <script src="/frontend/js/scriptCitas.js"></script>
+  <script src="/frontend/js/scriptHospital.js"></script>
+  <script src="/frontend/js/scriptRegister.js"></script>
+  <script src="/frontend/js/scriptBitacora.js"></script>
+  <script src="/frontend/js/scriptPacientes.js"></script>
+  <script src="/frontend/js/scriptUsuarios.js"></script>
+  <script src="/frontend/js/scriptPrincipal.js"></script>
+  
 </body>
 </html>
