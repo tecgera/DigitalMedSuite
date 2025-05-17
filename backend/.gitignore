@@ -1,0 +1,19 @@
+# Ignorar archivos bin y obj generados
+bin/
+obj/
+
+# Ignorar archivos específicos de debug y build
+*.exe
+*.dll
+*.pdb
+
+# Archivos y carpetas de configuración y cache de build
+*.cache
+*.json
+*.props
+*.dgspec.json
+*.editorconfig
+
+# Ignorar carpetas específicas de Debug y Release
+**/Debug/
+**/Release/
