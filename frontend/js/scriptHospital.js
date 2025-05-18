@@ -80,16 +80,23 @@ function cargarConsultorios() {
     const color = obtenerColorPorEstatus(consultorio.estatus);
 
     div.innerHTML = `
-      <div class="dato">
-        <strong>Nombre:</strong>
-        <span>${consultorio.nombre}</span>
-      </div>
-      <div class="dato">
-        <strong>Estatus:</strong>
-        <span><span class="circle" style="background:${color}; margin-right:6px;"></span>${consultorio.estatus}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="margin-left: 16px; display: flex; flex-wrap: wrap; gap: 30px;">
+          <div class="dato"><strong>Nombre:</strong> <span>${consultorio.nombre}</span></div>
+          <div class="dato" style="display: flex; align-items: center;"><strong>Estatus:</strong>
+            <span class="estatus-text-wrapper" style="margin-left: 6px; display: flex; align-items: center; gap: 6px;">
+              <span class="circle" style="background:${color}; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>
+              <span class="estatus-text">${consultorio.estatus}</span>
+            </span>
+          </div>
+        </div>
+        <button class="btn-icon editar-btn" title="Editar estatus">
+          <iconify-icon icon="mdi:pencil" width="20"></iconify-icon>
+        </button>
       </div>
     `;
 
+    div.querySelector('.editar-btn').addEventListener('click', (e) => editarConsultorioFlotante(e, index));
     lista.appendChild(div);
   });
 }
@@ -150,20 +157,40 @@ function seleccionarMedico(elemento, medico) {
 }
 
 // ========================
-// Mostrar detalles del médico
+// Mostrar detalles del médico reutilizable en filas con línea inferior
 // ========================
+function generarTarjetasDetalle(objeto) {
+  const campos = Object.entries(objeto);
+  let html = '<div class="cita" style="border:2px solid black; border-radius:12px; padding:20px; background:white; box-shadow: var(--shadow-md); transition: transform 0.3s ease; display: flex; flex-wrap: wrap; gap: 30px;">';
+
+  for (let i = 0; i < campos.length; i += 3) {
+    html += '<div style="display:flex; gap: 30px; flex: 1 1 100%;">';
+    for (let j = i; j < i + 3 && j < campos.length; j++) {
+      const [clave, valor] = campos[j];
+      html += `
+        <div style="flex: 1; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: flex-start; font-weight: 600;"><span>${capitalizar(clave)}:</span></div>
+          <div style="display: flex;  padding-top: 4px; border-bottom: 1px solid black;">${valor}</div>
+        </div>
+      `;
+    }
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function capitalizar(texto) {
+  return texto
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, str => str.toUpperCase());
+}
+
 function mostrarDetallesMedico(medico) {
   const panel = document.getElementById('resultadoMedico');
   if (!panel) return;
-
-  panel.innerHTML = `
-    <div class="dato"><strong>Nombre:</strong> <span>${medico.nombre} ${medico.apellidoPaterno} ${medico.apellidoMaterno}</span></div>
-    <div class="dato"><strong>Correo:</strong> <span>${medico.correo}</span></div>
-    <div class="dato"><strong>Teléfono:</strong> <span>${medico.telefono}</span></div>
-    <div class="dato"><strong>Especialidad:</strong> <span>${medico.especialidad}</span></div>
-    <div class="dato"><strong>Estado:</strong> <span>${medico.estado}</span></div>
-    <div class="dato"><strong>Fecha de Registro:</strong> <span>${medico.fechaCreacion}</span></div>
-  `;
+  panel.innerHTML = generarTarjetasDetalle(medico);
 }
 
 // ========================
@@ -183,3 +210,55 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+// ========================
+// Editar Consultorio flotante
+// ========================
+function editarConsultorioFlotante(event, index) {
+  const consultorio = consultorios[index];
+  const card = event.target.closest('.cita');
+  if (!card) return;
+
+  const existente = document.querySelector('.floating-selector');
+  if (existente) existente.remove();
+
+  const rect = card.getBoundingClientRect();
+
+  const contenedor = document.createElement('div');
+  contenedor.className = 'floating-selector';
+  contenedor.style.position = 'fixed';
+  contenedor.style.top = `${rect.bottom + 5}px`;
+  contenedor.style.left = `${rect.right - 250}px`;
+  contenedor.style.zIndex = 9999;
+  contenedor.style.background = '#fff';
+  contenedor.style.border = '1px solid #ccc';
+  contenedor.style.padding = '10px';
+  contenedor.style.borderRadius = '10px';
+  contenedor.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+
+  const select = document.createElement('select');
+  select.className = 'estatus-selector';
+  select.style.minWidth = '180px';
+
+  ['Disponible', 'Ocupado', 'En mantenimiento', 'Dado de baja'].forEach(opcion => {
+    const opt = document.createElement('option');
+    opt.value = opcion;
+    opt.textContent = opcion;
+    if (opcion === consultorio.estatus) opt.selected = true;
+    select.appendChild(opt);
+  });
+
+  const guardar = document.createElement('button');
+  guardar.textContent = 'Guardar';
+  guardar.className = 'btn primary-btn';
+  guardar.style.marginTop = '8px';
+  guardar.addEventListener('click', () => {
+    consultorio.estatus = select.value;
+    contenedor.remove();
+    cargarConsultorios();
+  });
+
+  contenedor.appendChild(select);
+  contenedor.appendChild(guardar);
+  document.body.appendChild(contenedor);
+}

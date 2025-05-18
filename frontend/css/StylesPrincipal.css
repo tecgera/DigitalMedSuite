@@ -2400,3 +2400,30 @@ flex: 1;
   height: 10px;
   border-radius: 50%;
 }
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.btn-icon iconify-icon {
+  color: var(--primary-color);
+}
+
+.estatus-selector {
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  font-size: 0.9rem;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+/*-------------------------------------------------------------------Terjetasd de detalles----------------------------------------------------------------------*/
+
+
+
+
+
