@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Paciente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f4fa;
+      padding: 40px 20px;
+    }
+
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      max-width: 900px;
+      margin: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      color: #6c2bd9;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    p {
+      color: #555;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    .col.short {
+      flex: 0 1 150px;
+    }
+
+    .input-icon {
+      position: relative;
+    }
+
+    .input-icon iconify-icon {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: #999;
+      pointer-events: none;
+    }
+
+    .input-icon input,
+    .input-icon select,
+    .input-icon textarea {
+      padding-left: 40px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input[type="date"] {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #6c2bd9;
+      box-shadow: 0 0 0 2px rgba(108, 43, 217, 0.1);
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #6c2bd9, #8a37f1);
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(90deg, #5921b8, #722be3);
+    }
+    .btn-cancel {
+      padding: 12px 24px;
+      background-color: #f0f0f0;
+      color: #555;
+      font-weight: 600;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+.btn-cancel:hover {
+  background-color: #e2e2e2;
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Registro de Paciente</h2>
+    <p>Complete el formulario para crear el expediente médico</p>
+
+    <form id="formPaciente" action="#" method="post">
+
+      <label>Nombre completo</label>
+      <div class="row">
+        <div class="col">
+          <label>Nombre(s)</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account"></iconify-icon>
+            <input type="text" name="nombre" placeholder="Nombre(s)" required>
+          </div>
+        </div>
+        <div class="col">
+          <label>Apellido Paterno</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account-outline"></iconify-icon>
+            <input type="text" name="apellidoP" placeholder="Apellido Paterno" required>
+          </div>
+        </div>
+        <div class="col">
+          <label>Apellido Materno</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account-outline"></iconify-icon>
+            <input type="text" name="apellidoM" placeholder="Apellido Materno">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>CURP</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:card-account-details-outline"></iconify-icon>
+            <input type="text" name="curp" placeholder="CURP" required>
+          </div>
+        </div>
+        <div class="col">
+          <label>Fecha de Nacimiento</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:cake-variant-outline"></iconify-icon>
+            <input type="date" name="fechaNacimiento" required>
+          </div>
+        </div>
+        <div class="col">
+          <label>Género</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:gender-male-female"></iconify-icon>
+            <select name="genero" required>
+              <option value="">Selecciona género</option>
+              <option value="femenino">Femenino</option>
+              <option value="masculino">Masculino</option>
+              <option value="otro">Otro</option>
+              <option value="noEspecificado">Prefiero no decir</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col short">
+          <label>Altura (cm)</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:ruler"></iconify-icon>
+            <input type="number" name="altura" placeholder="Altura" min="0" step="0.1" required>
+          </div>
+        </div>
+        <div class="col short">
+          <label>Peso (kg)</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:scale-bathroom"></iconify-icon>
+            <input type="number" name="peso" placeholder="Peso" min="0" step="0.1" required>
+          </div>
+        </div>
+        <div class="col">
+          <label>Teléfono</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:phone"></iconify-icon>
+            <input type="tel" name="telefono" placeholder="Teléfono" required>
+          </div>
+        </div>
+
+        <div class="col">
+          <label>Correo Electrónico</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:email-outline"></iconify-icon>
+            <input type="email" name="correo" placeholder="Correo electrónico" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Calle</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:road-variant"></iconify-icon>
+            <input type="text" name="calle" placeholder="Nombre de la calle" required>
+          </div>
+        </div>
+
+        <div class="col short">
+          <label>Número</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:numeric"></iconify-icon>
+            <input type="number" name="numeroCalle" placeholder="Ej. 123" required>
+          </div>
+        </div>
+
+        <div class="col short">
+          <label>Código Postal</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:mailbox-outline"></iconify-icon>
+            <input type="text" name="codigoPostal" placeholder="Ej. 22000" required>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col">
+          <label>Tipo de Sangre</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:blood-bag"></iconify-icon>
+            <select name="tipoSangre">
+              <option value="">No especificado</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+        </div>
+        <div class="col">
+          <label>Alergias</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:alert-decagram-outline"></iconify-icon>
+            <select name="alergias" id="alergias">
+              <option value="ninguna">Ninguna</option>
+              <option value="penicilina">Penicilina</option>
+              <option value="polen">Polen</option>
+              <option value="mariscos">Mariscos</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="col hidden" id="alergiaOtraContainer">
+          <label>Otra alergia</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:pencil-outline"></iconify-icon>
+            <input type="text" id="otraAlergia" name="otraAlergia" placeholder="Especifique otra alergia">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Operaciones</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:stethoscope"></iconify-icon>
+            <select name="operaciones" id="operaciones">
+              <option value="">Seleccione...</option>
+              <option value="cesarea">Cesárea</option>
+              <option value="apendicectomia">Apendicectomía</option>
+              <option value="bypass">Bypass gástrico</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col">
+          <label>Padecimientos</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:heart-pulse"></iconify-icon>
+            <select name="padecimientos" id="padecimientos">
+              <option value="">Seleccione...</option>
+              <option value="diabetes">Diabetes</option>
+              <option value="hipertension">Hipertensión</option>
+              <option value="asma">Asma</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col hidden" id="operacionOtraContainer">
+          <label>Otra operación</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:pencil-outline"></iconify-icon>
+            <input type="text" name="otraOperacion" placeholder="Especifique otra operación">
+          </div>
+        </div>
+
+        <div class="col hidden" id="padecimientoOtroContainer">
+          <label>Otro padecimiento</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:pencil-outline"></iconify-icon>
+            <input type="text" name="otroPadecimiento" placeholder="Especifique otro padecimiento">
+          </div>
+        </div>
+      </div>
+
+
+    <div class="row" style="justify-content: flex-end; gap: 10px;">
+      <button type="reset" class="btn-cancel">Cancelar</button>
+      <button type="submit" class="btn-submit" style="width: auto;">Registrar Paciente</button>
+    </div>
+    </form>
+  </div>
+
+<script>
+  const alergiasSelect = document.getElementById('alergias');
+  const otraAlergiaDiv = document.getElementById('alergiaOtraContainer');
+  alergiasSelect.addEventListener('change', function () {
+    otraAlergiaDiv.classList.toggle('hidden', this.value !== 'otro');
+  });
+
+  const operacionesSelect = document.getElementById('operaciones');
+  const otraOperacionDiv = document.getElementById('operacionOtraContainer');
+  operacionesSelect.addEventListener('change', function () {
+    otraOperacionDiv.classList.toggle('hidden', this.value !== 'otro');
+  });
+
+  const padecimientosSelect = document.getElementById('padecimientos');
+  const otroPadecimientoDiv = document.getElementById('padecimientoOtroContainer');
+  padecimientosSelect.addEventListener('change', function () {
+    otroPadecimientoDiv.classList.toggle('hidden', this.value !== 'otro');
+  });
+</script>
+
+
+
+</body>
+</html>
