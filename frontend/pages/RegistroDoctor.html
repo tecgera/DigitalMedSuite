@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registrar Doctor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="stylesheet" href="../css/StylesRegistroPaciente.css" />
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Registrar Doctor</h2>
+    <p>Complete el formulario para registrar al médico</p>
+
+    <form id="formDoctor" action="#" method="post">
+
+      <!-- Nombre completo -->
+      <label>Nombre completo</label>
+      <div class="row">
+        <div class="col">
+          <label>Nombre(s)</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account"></iconify-icon>
+            <input type="text" name="nombre" placeholder="Nombre(s)" required />
+          </div>
+        </div>
+        <div class="col">
+          <label>Apellido Paterno</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account-outline"></iconify-icon>
+            <input type="text" name="apellidoP" placeholder="Apellido Paterno" required />
+          </div>
+        </div>
+        <div class="col">
+          <label>Apellido Materno</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account-outline"></iconify-icon>
+            <input type="text" name="apellidoM" placeholder="Apellido Materno" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacto -->
+      <div class="row">
+        <div class="col">
+          <label>Teléfono</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:phone"></iconify-icon>
+            <input type="tel" name="telefono" placeholder="Teléfono" required />
+          </div>
+        </div>
+        <div class="col">
+          <label>Correo Electrónico</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:email-outline"></iconify-icon>
+            <input type="email" name="correo" placeholder="Correo electrónico" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- Especialidad -->
+      <div class="row">
+        <div class="col" id="especialidadContainer">
+          <label>Especialidad</label>
+          <div class="alergia-select-wrapper">
+            <div class="input-icon select-container">
+              <iconify-icon icon="mdi:stethoscope"></iconify-icon>
+              <select name="especialidades[]" class="especialidadSelect">
+                <option value="ninguna">Ninguna</option>
+                <option value="medicina_general">Medicina General</option>
+                <option value="cardiologia">Cardiología</option>
+                <option value="pediatria">Pediatría</option>
+                <option value="dermatologia">Dermatología</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="row" style="justify-content: flex-end; gap: 10px;">
+        <button type="reset" class="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn-submit" style="width: auto;">Registrar Doctor</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script src="../js/scriptRegistroDoctor.js"></script>
+</body>
+</html>

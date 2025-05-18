@@ -1,183 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Agendar Cita</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
- 
- <style>
-    /* Personalización morado/gris */
-    .flatpickr-day.selected,
-    .flatpickr-day.startRange,
-    .flatpickr-day.endRange,
-    .flatpickr-day:hover {
-      background-color: #6c2bd9 !important;
-      color: white !important;
-    }
-
-    .flatpickr-time input,
-    .flatpickr-day {
-      color: #555 !important;
-    }
-
-    .flatpickr-calendar {
-      font-family: 'Inter', sans-serif;
-      z-index: 9999;
-    }
-
-    .input-icon input.calendar {
-      padding-right: 40px;
-    }
-
-    .input-icon iconify-icon.calendar-icon {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
-      font-size: 20px;
-      color: #999;
-      pointer-events: none;
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f4f4fa;
-      padding: 40px 20px;
-    }
-
-    .form-container {
-      background-color: #ffffff;
-      padding: 30px 40px;
-      border-radius: 16px;
-      max-width: 900px;
-      margin: auto;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
-
-    h2 {
-      color: #6c2bd9;
-      margin-bottom: 25px;
-      text-align: center;
-    }
-
-    .row {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .col {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .input-icon {
-      position: relative;
-    }
-
-    .input-icon iconify-icon {
-      position: absolute;
-      top: 50%;
-      left: 12px;
-      transform: translateY(-50%);
-      font-size: 20px;
-      color: #999;
-      pointer-events: none;
-    }
-
-    .input-icon input,
-    .input-icon select {
-      width: 100%;
-      padding: 12px 12px 12px 40px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      font-size: 14px;
-      box-sizing: border-box;
-      outline: none;
-      transition: 0.2s ease;
-    }
-
-    input[type="datetime-local"] {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-    }
-
-    .input-icon input:focus,
-    .input-icon select:focus {
-      border-color: #6c2bd9;
-      box-shadow: 0 0 0 2px rgba(108, 43, 217, 0.1);
-    }
-
-    .btn-submit {
-      padding: 12px 24px;
-      background: linear-gradient(90deg, #6c2bd9, #8a37f1);
-      color: white;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
-    }
-
-    .btn-submit:hover {
-      background: linear-gradient(90deg, #5921b8, #722be3);
-    }
-
-    .btn-cancel {
-      padding: 12px 24px;
-      background-color: #f0f0f0;
-      color: #555;
-      font-weight: 600;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
-    }
-
-    .btn-cancel:hover {
-      background-color: #e2e2e2;
-    }
-
-    @media (max-width: 768px) {
-      .row {
-        flex-direction: column;
-      }
-
-      .form-container {
-        padding: 20px;
-      }
-
-      .input-icon input,
-      .input-icon select {
-        font-size: 16px;
-      }
-
-      .btn-submit,
-      .btn-cancel {
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .row.button-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../css/StylesRegistroCita.css" />
 </head>
 <body>
 
@@ -185,30 +16,28 @@
     <h2>Agendar Cita Médica</h2>
     <form action="#" method="post">
 
+      <!-- Número del paciente -->
       <div class="row">
-        <div class="col">
-          <label for="numeroCita">Número de Cita</label>
-          <div class="input-icon">
-            <iconify-icon icon="mdi:format-list-numbered"></iconify-icon>
-            <input type="text" id="numeroCita" name="numeroCita" placeholder="Ej. 0001" required>
-          </div>
-        </div>
-
         <div class="col">
           <label for="numeroPaciente">Número del Paciente</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account"></iconify-icon>
-            <input type="text" id="numeroPaciente" name="numeroPaciente" placeholder="ID del paciente" required>
+            <input type="text" id="numeroPaciente" name="numeroPaciente" placeholder="ID del paciente" required />
           </div>
         </div>
       </div>
 
+      <!-- Doctor y consultorio -->
       <div class="row">
         <div class="col">
           <label for="NombreDoctor">Doctor asignado</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:doctor"></iconify-icon>
-            <input type="text" id="NombreDoctor" name="NombreDoctor" placeholder="Nombre del doctor" required>
+            <select id="NombreDoctor" name="NombreDoctor" required>
+              <option value="">Seleccione...</option>
+              <option value="drLuna">Dr. Gabriel Luna</option>
+              <option value="draMorales">Dra. Verónica Morales</option>
+            </select>
           </div>
         </div>
 
@@ -216,17 +45,22 @@
           <label for="consultorio">Consultorio</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:office-building-marker-outline"></iconify-icon>
-            <input type="text" id="consultorio" name="consultorio" placeholder="Ej. 102" required>
+            <select id="consultorio" name="consultorio" required>
+              <option value="">Seleccione...</option>
+              <option value="101">Consultorio 101</option>
+              <option value="205">Consultorio 205</option>
+            </select>
           </div>
         </div>
       </div>
 
+      <!-- Fecha y estado -->
       <div class="row">
         <div class="col">
           <label for="fechaHoraCita">Fecha y Hora de la Cita</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:calendar-clock" class="calendar-icon"></iconify-icon>
-            <input type="text" id="fechaHoraCita" name="fechaHoraCita" placeholder="Selecciona fecha y hora" class="calendar" required>
+            <input type="text" id="fechaHoraCita" name="fechaHoraCita" placeholder="Selecciona fecha y hora" class="calendar" required />
           </div>
         </div>
 
@@ -245,6 +79,7 @@
         </div>
       </div>
 
+      <!-- Botones -->
       <div class="row button-row" style="justify-content: flex-end; gap: 10px;">
         <button type="reset" class="btn-cancel">Cancelar</button>
         <button type="submit" class="btn-submit">Agendar Cita</button>
@@ -253,14 +88,6 @@
     </form>
   </div>
 
-  <script>
-    flatpickr("#fechaHoraCita", {
-      enableTime: true,
-      dateFormat: "Y-m-d H:i",
-      time_24hr: false,
-      locale: "es"
-    });
-  </script>
-
+  <script src="../js/scriptRegistroCita.js"></script>
 </body>
 </html>

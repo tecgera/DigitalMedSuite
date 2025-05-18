@@ -273,3 +273,18 @@ function cargarCitasHoy() {
 document.addEventListener('DOMContentLoaded', function() {
   cargarCitasHoy();
 });
+
+// Agregar nueva cita
+function abrirFormularioCita() {
+  window.open('../pages/registroCita.html', 'FormularioCita',
+    'width=1000,height=600,scrollbars=yes,resizable=yes');
+}
+
+function abrirFormularioPaciente() {
+  const ventana = window.open('../pages/RegistroPaciente.html', 'FormularioPaciente', 'width=1050,height=750,scrollbars=yes,resizable=yes');
+  if (ventana) {
+    ventana.focus();
+  } else {
+    alert('Por favor, permite las ventanas emergentes para abrir el formulario.');
+  }
+}

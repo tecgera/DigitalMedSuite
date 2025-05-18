@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Consultorio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/StylesRegistroConsultorio.css">
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Registrar Consultorio</h2>
+    <p>Ingrese el nombre del nuevo consultorio para agregarlo al sistema</p>
+
+    <form id="formConsultorio" action="#" method="post">
+      <div class="row">
+        <div class="col">
+          <label for="nombreConsultorio">Nombre del Consultorio</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:office-building-marker-outline"></iconify-icon>
+            <input type="text" id="nombreConsultorio" name="nombreConsultorio" placeholder="Ej. Consultorio 101" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content: flex-end; gap: 10px;">
+        <button type="reset" class="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn-submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>
