@@ -10,6 +10,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/frontend/css/StylesPrincipal.css">
+  
+  
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
+
+
+
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
   <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 
@@ -289,7 +299,7 @@
           <div class="section-header">
             <h2>Gestión de Citas</h2>
             <div class="section-actions">
-              <button class="btn primary-btn" id="btnNuevaCita">
+              <button class="btn primary-btn" id="btnNuevaCita" onclick="showPage('registroCita')">
                 <iconify-icon icon="mdi:calendar-plus"></iconify-icon>
                 Nueva Cita
               </button>
@@ -358,7 +368,7 @@
             <h2>Gestión de Pacientes</h2>
             <div class="section-actions">
               <input type="text" id="busquedaPacientes" placeholder="Buscar por nombre...">
-              <button class="btn primary-btn" id="btnRegistrarPaciente">
+              <button class="btn primary-btn" id="btnRegistrarPaciente"onclick="showPage('registroPacientes')">
                 <iconify-icon icon="mdi:account-multiple-plus"></iconify-icon>
                 Registrar Paciente
               </button>
@@ -478,7 +488,7 @@
   <div id="medicosTab" class="tab-content active">
     <div class="pestania-header">
     <div class="section-actions">
-      <button class="btn primary-btn" id="btnRegistrarMedico">
+      <button class="btn primary-btn" id="btnRegistrarMedico"onclick="showPage('registroDoctores')">
         <iconify-icon icon="healthicons:doctor-female"></iconify-icon>
         Registrar Médico
       </button>
@@ -514,7 +524,7 @@
   <div id="consultoriosTab" class="tab-content">
     <div class="pestania-header">
     <div class="section-actions">
-      <button class="btn primary-btn" id="btnRegistrarUsuario">
+      <button class="btn primary-btn" id="btnRegistrarConsultorio"onclick="showPage('registroConsultorio')">
         <iconify-icon icon="healthicons:hospitalized-24px"></iconify-icon>
         Nuevo Consultorio
       </button>
@@ -612,6 +622,403 @@
         </section>
 
 
+        <!--======================-->
+        <!-- Register appointments Section -->
+         <!--======================-->
+        <section id="registroCita" class="page">
+  <div class="form-container-cita">
+    <h2>Agendar Cita Médica</h2>
+    <form action="#" method="post">
+      <div class="row">
+        <div class="col">
+          <label for="numeroPaciente">Número del Paciente</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account"></iconify-icon>
+            <input type="text" id="numeroPaciente" name="numeroPaciente" placeholder="ID del paciente" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label for="NombreDoctor">Doctor asignado</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:doctor"></iconify-icon>
+            <select id="NombreDoctor" name="NombreDoctor" required>
+              <option value="">Seleccione...</option>
+              <option value="drLuna">Dr. Gabriel Luna</option>
+              <option value="draMorales">Dra. Verónica Morales</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col">
+          <label for="consultorio">Consultorio</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:office-building-marker-outline"></iconify-icon>
+            <select id="consultorio" name="consultorio" required>
+              <option value="">Seleccione...</option>
+              <option value="101">Consultorio 101</option>
+              <option value="205">Consultorio 205</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label for="fechaHoraCita">Fecha y Hora de la Cita</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:calendar-clock" class="calendar-icon"></iconify-icon>
+            <input type="text" id="fechaHoraCita" name="fechaHoraCita" placeholder="Selecciona fecha y hora" class="calendar" required />
+          </div>
+        </div>
+
+        <div class="col">
+          <label for="estadoCita">Estado de la Cita</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:clipboard-text-clock"></iconify-icon>
+            <select id="estadoCita" name="estadoCita" required>
+              <option value="">Seleccione...</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="confirmada">Confirmada</option>
+              <option value="cancelada">Cancelada</option>
+              <option value="completada">Completada</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row button-row" style="justify-content: flex-end; gap: 10px;">
+        <button type="reset" class="btn-cancel-cita" onclick="showPage('citas')" >Cancelar</button>
+        <button type="submit" class="btn-submit-cita">Agendar Cita</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+
+         <!--======================-->
+        <!-- Register patients Section -->
+         <!--======================-->
+        <section id="registroPacientes" class="page">
+  <div class="form-containerPacientes">
+    <h2>Registro de Paciente</h2>
+    <p>Completa el formulario para crear el expediente médico</p>
+
+    <!-- Nombre completo -->
+    <div class="row">
+      <div class="input-group">
+        <label>Nombre(s)</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:account"></iconify-icon>
+          <input type="text" name="nombres" placeholder="Nombre(s)" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Apellido Paterno</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:account"></iconify-icon>
+          <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Apellido Materno</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:account"></iconify-icon>
+          <input type="text" name="apellido_materno" placeholder="Apellido Materno" />
+        </div>
+      </div>
+    </div>
+
+    <!-- CURP, fecha nacimiento, género -->
+    <div class="row">
+      <div class="input-group">
+        <label>CURP</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:card-account-details"></iconify-icon>
+          <input type="text" name="curp" placeholder="CURP" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Fecha de Nacimiento</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:calendar-month"></iconify-icon>
+          <input type="text" id="fechaNacimiento" name="fecha_nacimiento" placeholder="Selecciona fecha" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Género</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:gender-male-female"></iconify-icon>
+          <select name="genero">
+            <option value="">Selecciona género</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Altura, peso, teléfono -->
+    <div class="row">
+      <div class="input-group">
+        <label>Altura (cm)</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:ruler"></iconify-icon>
+          <input type="number" name="altura" placeholder="Altura" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Peso (kg)</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:scale-bathroom"></iconify-icon>
+          <input type="number" name="peso" placeholder="Peso" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Teléfono</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:phone"></iconify-icon>
+          <input type="text" name="telefono" placeholder="Teléfono" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Correo -->
+    <div class="row">
+      <div class="input-group">
+        <label>Correo Electrónico</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:email-outline"></iconify-icon>
+          <input type="email" name="correo" placeholder="Correo electrónico" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Dirección -->
+    <div class="row">
+      <div class="input-group">
+        <label>Calle</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:road-variant"></iconify-icon>
+          <input type="text" name="calle" placeholder="Nombre de la calle" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Número</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:numeric"></iconify-icon>
+          <input type="text" name="numero" placeholder="Ej. 123" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Código Postal</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:home-city-outline"></iconify-icon>
+          <input type="text" name="cp" placeholder="Ej. 22000" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipo de sangre -->
+    <div class="row">
+      <div class="input-group">
+        <label>Tipo de Sangre</label>
+        <div class="input-icon">
+          <iconify-icon icon="mdi:water-plus-outline"></iconify-icon>
+          <select name="tipo_sangre">
+            <option value="no">No especificado</option>
+            <option value="a+">A+</option>
+            <option value="a-">A-</option>
+            <option value="b+">B+</option>
+            <option value="b-">B-</option>
+            <option value="ab+">AB+</option>
+            <option value="ab-">AB-</option>
+            <option value="o+">O+</option>
+            <option value="o-">O-</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alergias -->
+    <div id="alergiasContainer">
+      <div class="row alergia-select-wrapper">
+        <div class="input-group">
+          <label>Alergias</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:alert-decagram-outline"></iconify-icon>
+            <select name="alergia[]" class="alergiaSelect">
+              <option value="ninguna">Ninguna</option>
+              <option value="penicilina">Penicilina</option>
+              <option value="polen">Polen</option>
+              <option value="mariscos">Mariscos</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operaciones -->
+    <div id="operacionesContainer">
+      <div class="row alergia-select-wrapper">
+        <div class="input-group">
+          <label>Operaciones</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:stethoscope"></iconify-icon>
+            <select name="operacion[]" class="operacionSelect">
+              <option value="ninguna">Ninguna</option>
+              <option value="cesarea">Cesárea</option>
+              <option value="apendicectomia">Apendicectomía</option>
+              <option value="bypass">Bypass gástrico</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Padecimientos -->
+    <div id="padecimientosContainer">
+      <div class="row alergia-select-wrapper">
+        <div class="input-group">
+          <label>Padecimientos</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:heart-pulse"></iconify-icon>
+            <select name="padecimiento[]" class="padecimientoSelect">
+              <option value="ninguna">Ninguna</option>
+              <option value="diabetes">Diabetes</option>
+              <option value="hipertension">Hipertensión</option>
+              <option value="asma">Asma</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="row botones-container">
+      <button type="button" class="btn-cancel" onclick="showPage('pacientes')">Cancelar</button>
+      <button type="submit" class="btn-submit">Registrar Paciente</button>
+    </div>
+  </div>
+</section>
+        
+
+        <!--======================-->
+        <!-- Register Consultories Section -->
+         <!--======================-->
+        <section id="registroConsultorio" class="page">
+  <div class="form-containerConsultorio">
+    <h2>Registrar Consultorio</h2>
+    <p>Ingrese el nombre del nuevo consultorio para agregarlo al sistema</p>
+
+    <form id="formConsultorio" action="#" method="post">
+      <div class="row">
+        <div class="col">
+          <label for="nombreConsultorio">Nombre del Consultorio</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:office-building-marker-outline"></iconify-icon>
+            <input type="text" id="nombreConsultorio" name="nombreConsultorio" placeholder="Ej. Consultorio 101" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="row botones-container">
+        <button type="reset" class="btn-cancel" onclick="showPage('hospital')">Cancelar</button>
+        <button type="submit" class="btn-submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+
+  <section id="registroDoctores" class="page">
+  <div class="form-containerDoctor">
+    <h2>Registrar Doctor</h2>
+    <p>Complete el formulario para registrar al médico</p>
+
+    <form id="formDoctor">
+      <!-- Nombre completo -->
+      <label>Nombre completo</label>
+      <div class="row">
+        <div class="col">
+          <label>Nombre(s)</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account"></iconify-icon>
+            <input type="text" name="nombre" placeholder="Nombre(s)" required />
+          </div>
+        </div>
+        <div class="col">
+          <label>Apellido Paterno</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account-outline"></iconify-icon>
+            <input type="text" name="apellidoP" placeholder="Apellido Paterno" required />
+          </div>
+        </div>
+        <div class="col">
+          <label>Apellido Materno</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:account-outline"></iconify-icon>
+            <input type="text" name="apellidoM" placeholder="Apellido Materno" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacto -->
+      <div class="row">
+        <div class="col">
+          <label>Teléfono</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:phone"></iconify-icon>
+            <input type="tel" name="telefono" placeholder="Teléfono" required />
+          </div>
+        </div>
+        <div class="col">
+          <label>Correo Electrónico</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:email-outline"></iconify-icon>
+            <input type="email" name="correo" placeholder="Correo electrónico" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- Especialidad -->
+      <div class="row">
+        <div class="col">
+          <label>Especialidad</label>
+          <div class="input-icon">
+            <iconify-icon icon="mdi:stethoscope"></iconify-icon>
+            <select name="especialidad" required>
+              <option value="ninguna">Ninguna</option>
+              <option value="medicina_general">Medicina General</option>
+              <option value="cardiologia">Cardiología</option>
+              <option value="pediatria">Pediatría</option>
+              <option value="dermatologia">Dermatología</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="row" style="justify-content: flex-end; gap: 10px;">
+        <button type="reset" class="btn-cancel" onclick="showPage('hospital')">Cancelar</button>
+        <button type="submit" class="btn-submit">Registrar Doctor</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+  </div>
+
+       
+       
+
          
 
       </div><!--======================-->
@@ -625,6 +1032,10 @@
   <script src="/frontend/js/scriptPacientes.js"></script>
   <script src="/frontend/js/scriptUsuarios.js"></script>
   <script src="/frontend/js/scriptPrincipal.js"></script>
+  <script src="/frontend/js/scriptRegistroCita.js"></script>
+  <script src="/frontend/js/scriptRegistroDoctor.js"></script>
+  <script src="/frontend/js/scriptRegistroPaciente.js"></script>
+  
   
 </body>
 </html>

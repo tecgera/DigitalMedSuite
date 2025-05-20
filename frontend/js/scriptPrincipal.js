@@ -49,7 +49,11 @@ function updatePageTitle(pageId) {
     hospital: 'Gestión de Hospital',
     registro: 'Registro de Usuario',
     medicos: 'Gestión de Médicos',
-    consultorios: 'Gestión de Consultorios'
+    consultorios: 'Gestión de Consultorios',
+    registroDoctores:'Registro de Medicos',
+    registroConsultorio:'Registro de Consultorios',
+    registroPacientes:'Registro de Pacientes',
+    registroCita:'Registro de Citas'
   };
   titleElement.textContent = titles[pageId] || 'DigitalMedSuite';
 }

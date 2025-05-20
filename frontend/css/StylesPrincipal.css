@@ -2421,8 +2421,538 @@ flex: 1;
   font-size: 0.9rem;
 }
 
-/*-------------------------------------------------------------------Terjetasd de detalles----------------------------------------------------------------------*/
+/*-------------------------------------------------------------------Registro Citas----------------------------------------------------------------------*/
 
+
+/* === Registro de Citas === */
+.form-container-cita {
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.form-container-cita h2 {
+  color: #6c2bd9;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.form-container-cita .row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.form-container-cita .col {
+  flex: 1;
+  min-width: 250px;
+}
+
+.form-container-cita label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-container-cita .input-icon {
+  position: relative;
+}
+
+.form-container-cita .input-icon iconify-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #999;
+  pointer-events: none;
+}
+
+.form-container-cita .input-icon input,
+.form-container-cita .input-icon select {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.form-container-cita .input-icon input:focus,
+.form-container-cita .input-icon select:focus {
+  border-color: #6c2bd9;
+  box-shadow: 0 0 0 2px rgba(108, 43, 217, 0.1);
+}
+
+.btn-submit-cita {
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #6c2bd9, #8a37f1);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.btn-submit-cita:hover {
+  background: linear-gradient(90deg, #5921b8, #722be3);
+}
+
+.btn-cancel-cita {
+  padding: 12px 24px;
+  background-color: #f0f0f0;
+  color: #555;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.btn-cancel-cita:hover {
+  background-color: #e2e2e2;
+}
+
+.input-icon input.calendar {
+  padding-right: 40px;
+}
+
+.input-icon iconify-icon.calendar-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #999;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .form-container-cita .row {
+    flex-direction: column;
+  }
+
+  .form-container-cita {
+    padding: 20px;
+  }
+
+  .form-container-cita .input-icon input,
+  .form-container-cita .input-icon select {
+    font-size: 16px;
+  }
+
+  .btn-submit-cita,
+  .btn-cancel-cita {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .form-container-cita .row.button-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
+/*------------------------------------------------------------------------Registro Medico--------------------------------------------------------------------------*/
+
+/* === ESTILOS EXCLUSIVOS PARA #registroDoctores === */
+
+#registroDoctores h2 {
+  color: #6c2bd9;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+#registroDoctores p {
+  color: #555;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+#registroDoctores .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#registroDoctores .col {
+  flex: 1;
+  min-width: 250px;
+}
+
+#registroDoctores label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+#registroDoctores .input-icon {
+  position: relative;
+}
+
+#registroDoctores .input-icon iconify-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #999;
+  pointer-events: none;
+}
+
+#registroDoctores .input-icon input,
+#registroDoctores .input-icon select {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+#registroDoctores .input-icon input:focus,
+#registroDoctores .input-icon select:focus {
+  border-color: #6c2bd9;
+  box-shadow: 0 0 0 2px rgba(108, 43, 217, 0.1);
+}
+
+#registroDoctores .alergia-select-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+#registroDoctores .select-container {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+#registroDoctores .select-container select {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+#registroDoctores .select-container iconify-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #999;
+  pointer-events: none;
+}
+
+#registroDoctores .btn-submit,
+#registroDoctores .btn-cancel {
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#registroDoctores .btn-submit {
+  background: linear-gradient(90deg, #6c2bd9, #8a37f1);
+  color: white;
+  border: none;
+}
+
+#registroDoctores .btn-submit:hover {
+  background: linear-gradient(90deg, #5921b8, #722be3);
+}
+
+#registroDoctores .btn-cancel {
+  background-color: #f0f0f0;
+  color: #555;
+  border: 1px solid #ccc;
+}
+
+#registroDoctores .btn-cancel:hover {
+  background-color: #e2e2e2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #registroDoctores .row {
+    flex-direction: column;
+  }
+
+  #registroDoctores .btn-submit,
+  #registroDoctores .btn-cancel {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  #registroDoctores .form-container {
+    padding: 20px;
+  }
+}
+
+.form-containerDoctor{
+   background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  max-width: 900px;
+  margin: 40px auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/* === EXCLUSIVO PARA #registroPacientes === */
+
+#registroPacientes .form-containerPacientes {
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+#registroPacientes h2 {
+  color: #6c2bd9;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+#registroPacientes p {
+  color: #555;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+#registroPacientes .row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 18px; /* separa grupos */
+  flex-wrap: wrap;
+}
+
+#registroPacientes .input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#registroPacientes .input-group label {
+  margin-bottom: 6px; /* separación cercana al input */
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Input con ícono */
+#registroPacientes .input-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#registroPacientes .input-icon iconify-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 20px;
+  color: #999;
+  pointer-events: none;
+}
+
+#registroPacientes .input-icon input,
+#registroPacientes .input-icon select {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s ease;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+#registroPacientes .input-icon input:focus,
+#registroPacientes .input-icon select:focus {
+  border-color: #6c2bd9;
+  box-shadow: 0 0 0 2px rgba(108, 43, 217, 0.1);
+}
+
+/* Select dinámico como alergias */
+#registroPacientes .alergia-select-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+#registroPacientes .alergia-select-wrapper .input-group {
+  flex: 1;
+}
+
+/* Botones */
+#registroPacientes .botones-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+#registroPacientes .btn-submit {
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #6c2bd9, #8a37f1);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#registroPacientes .btn-submit:hover {
+  background: linear-gradient(90deg, #5921b8, #722be3);
+}
+
+#registroPacientes .btn-cancel {
+  padding: 12px 24px;
+  background-color: #f0f0f0;
+  color: #555;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+#registroPacientes .btn-cancel:hover {
+  background-color: #e2e2e2;
+}
+
+/*-------------------------------------------------------------------registro Consultorios---------------------------------------------------------------*/
+
+#registroConsultorio .form-containerConsultorio {
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  max-width: 600px;
+  margin: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+#registroConsultorio h2 {
+  color: #6c2bd9;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+#registroConsultorio p {
+  color: #555;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+#registroConsultorio .row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+#registroConsultorio .col {
+  flex: 1;
+}
+
+#registroConsultorio label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: #333;
+}
+
+#registroConsultorio .input-icon {
+  position: relative;
+}
+
+#registroConsultorio .input-icon iconify-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #999;
+  pointer-events: none;
+}
+
+#registroConsultorio .input-icon input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+#registroConsultorio .input-icon input:focus {
+  border-color: #6c2bd9;
+  box-shadow: 0 0 0 2px rgba(108, 43, 217, 0.1);
+}
+
+#registroConsultorio .botones-container {
+  justify-content: flex-end;
+}
+
+#registroConsultorio .btn-submit {
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #6c2bd9, #8a37f1);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+#registroConsultorio .btn-submit:hover {
+  background: linear-gradient(90deg, #5921b8, #722be3);
+}
+
+#registroConsultorio .btn-cancel {
+  padding: 12px 24px;
+  background-color: #f0f0f0;
+  color: #555;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+#registroConsultorio .btn-cancel:hover {
+  background-color: #e2e2e2;
+}
 
 
 
