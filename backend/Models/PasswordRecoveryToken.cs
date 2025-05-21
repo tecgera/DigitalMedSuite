@@ -16,12 +16,13 @@ namespace backend.Models
         public int UsuarioId { get; set; }
         
         [ForeignKey("UsuarioId")]
-        public Usuario Usuario { get; set; }
+        public Usuario? Usuario { get; set; }
         
         [Required]
         public DateTime ExpirationDate { get; set; }
         
-        public bool Used { get; set; }
+        [Required]
+        public bool Used { get; set; } = false;
         
         public DateTime? UsedDate { get; set; }
     }

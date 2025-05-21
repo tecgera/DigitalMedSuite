@@ -1,39 +1,49 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
     public class Usuario
     {
         [Key]
-        public int Id { get; set; }
+        public int ID_Usuario { get; set; }
 
         [Required(ErrorMessage = "El nombre de usuario es obligatorio")]
-        [StringLength(50)]
-        public string Username { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "El email es obligatorio")]
-        [EmailAddress(ErrorMessage = "El formato del email no es válido")]
-        [StringLength(150)]
-        public string Email { get; set; } = string.Empty;
+        [StringLength(20)]
+        public string Nombre_Usuario { get; set; } = null!;
 
         [Required(ErrorMessage = "La contraseña es obligatoria")]
-        [StringLength(255)] // Almacenaremos el hash de la contraseña
-        public string PasswordHash { get; set; } = string.Empty;
+        [StringLength(30)]
+        public string ContrasenaHash { get; set; } = null!;
 
-        // Para almacenar el rol: "Admin", "Medico", "Paciente", etc.
         [Required]
+        public int ID_Rol { get; set; }
+        
+        [ForeignKey("ID_Rol")]
+        public Rol? Rol { get; set; }
+
         [StringLength(20)]
-        public string Rol { get; set; } = "Usuario";
+        public string? Nombre { get; set; }
 
-        // Referencia opcional a un paciente (si el usuario es un paciente)
-        public int? PacienteId { get; set; }
-        
-        // Referencia opcional a un médico (si el usuario es un médico)
-        public int? MedicoId { get; set; }
+        [StringLength(20)]
+        public string? Apellido_Paterno { get; set; }
 
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        [StringLength(20)]
+        public string? Apellido_Materno { get; set; }
+
+        [StringLength(20)]
+        [EmailAddress]
+        public string? Correo { get; set; }
+
+        [StringLength(20)]
+        public string? Telefono { get; set; }
+
+        public int? ID_Estatus { get; set; }
         
-        public DateTime? UltimoAcceso { get; set; }
+        [ForeignKey("ID_Estatus")]
+        public EstatusUsuario? EstatusUsuario { get; set; }
+
+        public DateTime Fecha_Creacion { get; set; } = DateTime.Now;
     }
 }

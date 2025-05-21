@@ -7,32 +7,36 @@ namespace backend.Models
     public class Cita
     {
         [Key]
-        public int Id { get; set; }
+        public int ID_Cita { get; set; }
 
         [Required]
-        public int PacienteId { get; set; }
-
-        [ForeignKey("PacienteId")]
+        public int ID_Paciente { get; set; }
+        [ForeignKey("ID_Paciente")]
         public Paciente? Paciente { get; set; }
 
         [Required]
-        public int MedicoId { get; set; }
-
-        [ForeignKey("MedicoId")]
+        public int ID_Medico { get; set; }
+        [ForeignKey("ID_Medico")]
         public Medico? Medico { get; set; }
 
-        [Required(ErrorMessage = "La fecha y hora son obligatorias")]
-        public DateTime FechaHora { get; set; }
+        [Required]
+        public DateTime Fecha_Cita { get; set; }
 
-        [StringLength(500)]
-        public string Motivo { get; set; } = string.Empty;
+        [Required]
+        public TimeSpan Hora_Cita { get; set; }
 
-        [StringLength(50)]
-        public string Estado { get; set; } = "Programada"; // Programada, Completada, Cancelada, etc.
+        [Required]
+        public int ID_Consultorio { get; set; }
+        [ForeignKey("ID_Consultorio")]
+        public Consultorio? Consultorio { get; set; }
 
-        public string Notas { get; set; } = string.Empty;
+        [Required]
+        public int ID_Estatus { get; set; }
+        [ForeignKey("ID_Estatus")]
+        public EstatusCita? EstatusCita { get; set; }
 
-        // Fecha de registro
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public DateTime Fecha_Creacion { get; set; } = DateTime.Now;
+        
+        public DateTime Ultima_Actualizacion { get; set; } = DateTime.Now;
     }
 }

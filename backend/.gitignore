@@ -1,0 +1,47 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio cache files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider cache files
+.idea/
+
+# ASP.NET temporary files
+*.dll
+*.pdb
+*.cache
+*.json
+
+# Generated files
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.FileListAbsolute.txt
+
+# Debug folders and files
+backend/obj/
+backend/bin/
+backend/*.pdb
+backend/*.dll
+backend/*.cache
+backend/*.json
+
+# Visual Studio Code settings folder
+.vscode/
+
+# NuGet Packages folder
+packages/
+
+# Resharper files
+_ReSharper*/
+
+# Others
+*.log
+*.vspscc
+*.vssscc
+
+# Publish folder
+publish/
