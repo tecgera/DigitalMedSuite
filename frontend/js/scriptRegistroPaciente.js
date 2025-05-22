@@ -340,15 +340,18 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
     const selectedValue = e.target.value;
     const wrapper = e.target.closest('.alergia-select-wrapper');
     const isLast = e.target === container.querySelectorAll(`.${className}`)[container.querySelectorAll(`.${className}`).length - 1];
-    const selectContainer = wrapper.querySelector('.select-container');
-
-    if (selectedValue === 'otro' && !wrapper.querySelector(`.otro${nameAttr}Input`)) {
+    const selectContainer = wrapper.querySelector('.select-container');    if (selectedValue === 'otro' && !wrapper.querySelector(`.otro${nameAttr}Input`)) {
+      const inputGroup = document.createElement('div'); 
+      inputGroup.className = 'input-group';
+      
       const input = document.createElement('input');
       input.type = 'text';
       input.name = `otra${nameAttr}[]`;
       input.placeholder = `Especifique otra ${nameAttr.toLowerCase()}`;
       input.className = `otroAlergiaInput otro${nameAttr}Input`;
-      wrapper.appendChild(input);
+      
+      inputGroup.appendChild(input);
+      wrapper.appendChild(inputGroup);
       if (selectContainer) selectContainer.style.flex = "0 0 250px";
     }
 
@@ -356,17 +359,17 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
       const input = wrapper.querySelector(`.otro${nameAttr}Input`);
       if (input) input.remove();
       if (selectContainer) selectContainer.style.flex = "1";
-    }
-
-    if (selectedValue !== 'ninguna' && isLast) {
+    }    if (selectedValue !== 'ninguna' && isLast) {
       const newWrapper = document.createElement('div');
-      newWrapper.className = 'alergia-select-wrapper';
+      newWrapper.className = 'row alergia-select-wrapper';
       newWrapper.innerHTML = `
-        <div class="input-icon select-container">
-          <iconify-icon icon="${icon}"></iconify-icon>
-          <select name="${nameAttr.toLowerCase()}[]" class="${className}">
-            ${options}
-          </select>
+        <div class="input-group">
+          <div class="input-icon select-container">
+            <iconify-icon icon="${icon}"></iconify-icon>
+            <select name="${nameAttr.toLowerCase()}[]" class="${className}">
+              ${options}
+            </select>
+          </div>
         </div>
       `;
       container.appendChild(newWrapper);

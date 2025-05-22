@@ -1,10 +1,12 @@
 // ========================
 // Gestión de pacientes con API real
 // ========================
-let pacientes = [];
-let pacienteSeleccionado = null;
-let modoEdicion = false;
-let filtroActual = 'todos';
+const moduloPacientes = {
+    pacientes: [],
+    pacienteSeleccionado: null,
+    modoEdicion: false,
+    filtroActual: 'todos'
+};
 
 // ========================
 // Cargar pacientes
@@ -20,10 +22,9 @@ async function cargarPacientes() {
         <iconify-icon icon="mdi:loading" width="48" class="spin"></iconify-icon>
         <p>Cargando pacientes...</p>
       </div>
-    `;
-
-    // Obtener pacientes desde la API
+    `;    // Obtener pacientes desde la API
     const response = await window.apiService.pacientes.getAll();
+    console.log('Respuesta del servidor:', response);
     pacientes = response || [];
 
     lista.innerHTML = '';
@@ -38,9 +39,7 @@ async function cargarPacientes() {
           <p>No hay pacientes registrados</p>
         </div>`;
       return;
-    }
-
-    filtrados.forEach((paciente) => {
+    }    filtrados.forEach((paciente) => {
       const div = document.createElement('div');
       div.classList.add('cita');
       div.setAttribute('data-id', paciente.ID_Paciente);
@@ -56,6 +55,7 @@ async function cargarPacientes() {
             </div>
           </div>
           <div class="patient-details">
+            <div class="detail"><strong>ID:</strong> ${paciente.ID_Paciente}</div>
             <div class="detail"><strong>Correo:</strong> ${paciente.Correo_Electronico || 'No registrado'}</div>
             <div class="detail"><strong>Teléfono:</strong> ${paciente.Telefono || 'No registrado'}</div>
           </div>
@@ -334,8 +334,7 @@ function mostrarPacientesEnLista(pacientesFiltrados) {
       </div>`;
     return;
   }
-  
-  pacientesFiltrados.forEach((paciente) => {
+    pacientesFiltrados.forEach((paciente) => {
     const div = document.createElement('div');
     div.classList.add('cita');
     div.setAttribute('data-id', paciente.ID_Paciente);
@@ -351,6 +350,7 @@ function mostrarPacientesEnLista(pacientesFiltrados) {
           </div>
         </div>
         <div class="patient-details">
+          <div class="detail"><strong>ID:</strong> ${paciente.ID_Paciente}</div>
           <div class="detail"><strong>Correo:</strong> ${paciente.Correo_Electronico || 'No registrado'}</div>
           <div class="detail"><strong>Teléfono:</strong> ${paciente.Telefono || 'No registrado'}</div>
         </div>
@@ -406,10 +406,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Configurar botón para registrar nuevo paciente
   const btnRegistrarPaciente = document.getElementById('btnRegistrarPaciente');
   if (btnRegistrarPaciente) {
-    btnRegistrarPaciente.addEventListener('click', () => {
-      // Aseguramos que no estemos en modo edición
-      modoEdicionPaciente = false;
-      pacienteEditando = null;
+    btnRegistrarPaciente.addEventListener('click', () => {      // Aseguramos que no estemos en modo edición
+      modoEdicion = false;
+      pacienteSeleccionado = null;
       
       // Navegamos a la página de registro
       showPage('registroPacientes');
