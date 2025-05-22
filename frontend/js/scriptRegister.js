@@ -11,7 +11,21 @@ function togglePassword() {
     }
 }
 
+function toggleConfirmPassword() {
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const toggleIcon = document.getElementById('toggleIconConfirm');
+    
+    if (confirmPasswordInput.type === 'password') {
+        confirmPasswordInput.type = 'text';
+        toggleIcon.setAttribute('icon', 'mdi:eye');
+    } else {
+        confirmPasswordInput.type = 'password';
+        toggleIcon.setAttribute('icon', 'mdi:eye-off');
+    }
+}
+
 window.togglePassword = togglePassword;
+window.toggleConfirmPassword = toggleConfirmPassword;
 
 function showError(inputElement, message) {
     inputElement.classList.add('error-input');
@@ -46,32 +60,39 @@ function clearError(inputElement) {
 }
 
 // URL base de la API
-const apiBaseUrl = 'http://localhost:5027/api';
+const apiBaseUrl = 'http://localhost:5180/api';
 
-// Guardar token en sessionStorage
-function saveAuthToken(token, userData) {
-    sessionStorage.setItem('authToken', token);
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-}
+// Removemos la función navigateToPage para evitar confusiones y posibles recursiones
+// La navegación debe hacerse directamente usando la función showPage definida en scriptPrincipal.js
 
 // Manejar el envío del formulario de registro
 document.getElementById('submit').addEventListener('click', function() {
     const usernameInput = document.getElementById('username');
+    const nombreInput = document.getElementById('nombre');
+    const apellidoPaternoInput = document.getElementById('apellidoPaterno');
+    const apellidoMaternoInput = document.getElementById('apellidoMaterno');
     const emailInput = document.getElementById('email');
+    const telefonoInput = document.getElementById('telefono');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
-    const userTypeSelect = document.getElementById('userType');
+    const rolIdSelect = document.getElementById('rolId');
     
     const username = usernameInput.value.trim();
+    const nombre = nombreInput.value.trim();
+    const apellidoPaterno = apellidoPaternoInput.value.trim();
+    const apellidoMaterno = apellidoMaternoInput.value.trim();
     const email = emailInput.value.trim();
+    const telefono = telefonoInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
-    const rol = userTypeSelect.value;
+    const rolId = parseInt(rolIdSelect.value);
     
     let isValid = true;
     
     // Limpiar errores previos
     clearError(usernameInput);
+    clearError(nombreInput);
+    clearError(apellidoPaternoInput);
     clearError(emailInput);
     clearError(passwordInput);
     clearError(confirmPasswordInput);
@@ -82,6 +103,18 @@ document.getElementById('submit').addEventListener('click', function() {
         isValid = false;
     } else if (username.length < 3) {
         showError(usernameInput, 'El nombre de usuario debe tener al menos 3 caracteres');
+        isValid = false;
+    }
+    
+    // Validar nombre
+    if (!nombre) {
+        showError(nombreInput, 'Por favor, ingrese su nombre');
+        isValid = false;
+    }
+    
+    // Validar apellido paterno
+    if (!apellidoPaterno) {
+        showError(apellidoPaternoInput, 'Por favor, ingrese su apellido paterno');
         isValid = false;
     }
     
@@ -111,8 +144,7 @@ document.getElementById('submit').addEventListener('click', function() {
         showError(confirmPasswordInput, 'Las contraseñas no coinciden');
         isValid = false;
     }
-    
-    if (isValid) {
+      if (isValid) {
         // Mostrar animación de carga
         const submitButton = document.getElementById('submit');
         const originalText = submitButton.textContent;
@@ -121,12 +153,17 @@ document.getElementById('submit').addEventListener('click', function() {
         
         // Preparar datos para enviar
         const registerData = {
-            username: username,
-            email: email,
-            password: password,
-            confirmPassword: confirmPassword,
-            rol: rol
+            Nombre_Usuario: username,
+            Password: password,
+            Nombre: nombre,
+            Apellido_Paterno: apellidoPaterno,
+            Apellido_Materno: apellidoMaterno,
+            Correo: email,
+            Telefono: telefono,
+            ID_Rol: rolId
         };
+        
+        console.log('Enviando datos:', registerData);
         
         // Hacer la petición al API
         fetch(`${apiBaseUrl}/Auth/register`, {
@@ -145,17 +182,33 @@ document.getElementById('submit').addEventListener('click', function() {
             return response.json();
         })
         .then(data => {
+            // Mostrar mensaje de éxito
+            alert('Usuario registrado correctamente');
+            
             // Guardar el token y datos del usuario
             const userData = {
-                username: data.username,
-                email: data.email,
-                rol: data.rol
+                username: data.Nombre_Usuario,
+                nombre: data.Nombre,
+                apellidoPaterno: data.Apellido_Paterno,
+                apellidoMaterno: data.Apellido_Materno,
+                email: data.Correo,
+                rol: data.Rol
             };
             
-            saveAuthToken(data.token, userData);
+            // Guardar los datos de autenticación si se desea iniciar sesión automáticamente
+            // o comentar esta línea si no se desea iniciar sesión automáticamente
+            window.authUtils.saveAuth(data.Token, userData);
             
-            // Redireccionar al dashboard
-            window.location.href = 'Principal.html';
+            // Redireccionar a la página de usuarios
+            showPage('usuarios');
+            
+            // Limpiar el formulario
+            document.getElementById('registerForm').reset();
+            
+            // Recargar la lista de usuarios
+            if (typeof cargarUsuarios === 'function') {
+                cargarUsuarios();
+            }
         })
         .catch(error => {
             console.error('Error de registro:', error);

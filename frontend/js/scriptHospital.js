@@ -1,221 +1,105 @@
 // ========================
-// Simulación de datos de médicos
+// Hospital Script
 // ========================
-const medicosRegistrados = [
-  {
-    nombre: 'Luis',
-    apellidoPaterno: 'Hernández',
-    apellidoMaterno: 'García',
-    correo: 'lhernandez@example.com',
-    telefono: '6641234567',
-    especialidad: 'Cardiología',
-    estado: 'Activo',
-    fechaCreacion: '2024-05-10'
-  },
-  {
-    nombre: 'María',
-    apellidoPaterno: 'López',
-    apellidoMaterno: 'Martínez',
-    correo: 'mlopez@example.com',
-    telefono: '6647654321',
-    especialidad: 'Neurología',
-    estado: 'Activo',
-    fechaCreacion: '2024-04-20'
-  }
-];
 
-let medicoSeleccionado = null;
-
-// ========================
-// Simulación de datos de consultorios
-// ========================
-const consultorios = [
-  {
-    nombre: 'Consultorio 101',
-    estatus: 'Disponible'
-  },
-  {
-    nombre: 'Consultorio 102',
-    estatus: 'Ocupado'
-  },
-  {
-    nombre: 'Consultorio 103',
-    estatus: 'En mantenimiento'
-  },
-  {
-    nombre: 'Consultorio 104',
-    estatus: 'Dado de baja'
-  }
-];
-
+let consultorios = [];
 let filtroActual = 'todos';
 
 // ========================
-// Cargar consultorios con filtro
+// Cargar consultorios
 // ========================
-function cargarConsultorios() {
+async function cargarConsultorios() {
   const lista = document.getElementById('listaConsultorios');
   if (!lista) return;
 
-  lista.innerHTML = '';
-
-  const filtrados = filtroActual === 'todos'
-    ? consultorios
-    : consultorios.filter(c => c.estatus === filtroActual);
-
-  if (filtrados.length === 0) {
+  try {
+    // Mostrar indicador de carga
     lista.innerHTML = `
-      <div class="empty-state">
-        <iconify-icon icon="mdi:office-building" width="48"></iconify-icon>
-        <p>No hay consultorios registrados</p>
-      </div>`;
-    return;
-  }
-
-  filtrados.forEach((consultorio, index) => {
-    const div = document.createElement('div');
-    div.classList.add('cita');
-    div.setAttribute('data-index', index);
-
-    const color = obtenerColorPorEstatus(consultorio.estatus);
-
-    div.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div style="margin-left: 16px; display: flex; flex-wrap: wrap; gap: 30px;">
-          <div class="dato"><strong>Nombre:</strong> <span>${consultorio.nombre}</span></div>
-          <div class="dato" style="display: flex; align-items: center;"><strong>Estatus:</strong>
-            <span class="estatus-text-wrapper" style="margin-left: 6px; display: flex; align-items: center; gap: 6px;">
-              <span class="circle" style="background:${color}; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>
-              <span class="estatus-text">${consultorio.estatus}</span>
-            </span>
-          </div>
-        </div>
-        <button class="btn-icon editar-btn" title="Editar estatus">
-          <iconify-icon icon="mdi:pencil" width="20"></iconify-icon>
-        </button>
+      <div class="loading-indicator">
+        <iconify-icon icon="mdi:loading" width="48" class="spin"></iconify-icon>
+        <p>Cargando consultorios...</p>
       </div>
     `;
 
-    div.querySelector('.editar-btn').addEventListener('click', (e) => editarConsultorioFlotante(e, index));
-    lista.appendChild(div);
-  });
-}
+    // Obtener consultorios desde la API
+    const response = await window.apiService.consultorios.getAll();
+    consultorios = response || [];
 
-function obtenerColorPorEstatus(estatus) {
-  switch (estatus) {
-    case 'Disponible': return '#2ecc71';
-    case 'Ocupado': return '#e67e22';
-    case 'En mantenimiento': return '#f1c40f';
-    case 'Dado de baja': return '#e74c3c';
-    default: return '#bdc3c7';
-  }
-}
+    lista.innerHTML = '';
+    const filtrados = filtroActual === 'todos'
+      ? consultorios
+      : consultorios.filter(c => c.EstatusNombre?.toLowerCase() === filtroActual.toLowerCase());
 
-// ========================
-// Cargar médicos
-// ========================
-function cargarMedicos() {
-  const lista = document.getElementById('listaMedicos');
-  if (!lista) return;
+    if (filtrados.length === 0) {
+      lista.innerHTML = `
+        <div class="empty-state">
+          <iconify-icon icon="mdi:office-building" width="48"></iconify-icon>
+          <p>No hay consultorios registrados</p>
+        </div>`;
+      return;
+    }
 
-  lista.innerHTML = '';
-
-  if (medicosRegistrados.length === 0) {
-    lista.innerHTML = `
-      <div class="empty-state">
-        <iconify-icon icon="mdi:doctor" width="48"></iconify-icon>
-        <p>No hay médicos registrados</p>
-      </div>`;
-    return;
-  }
-
-  medicosRegistrados.forEach((medico, index) => {
-    const div = document.createElement('div');
-    div.classList.add('cita');
-    div.setAttribute('data-index', index);
-
-    div.innerHTML = `
-      <div class="dato"><strong>Nombre:</strong> <span>${medico.nombre} ${medico.apellidoPaterno}</span></div>
-      <div class="dato"><strong>Especialidad:</strong> <span>${medico.especialidad}</span></div>
-    `;
-
-    div.addEventListener('click', () => seleccionarMedico(div, medico));
-    lista.appendChild(div);
-  });
-}
-
-// ========================
-// Seleccionar médico
-// ========================
-function seleccionarMedico(elemento, medico) {
-  document.querySelectorAll('#listaMedicos .cita').forEach(el => el.classList.remove('seleccionada'));
-  elemento.classList.add('seleccionada');
-  medicoSeleccionado = medico;
-
-  mostrarDetallesMedico(medico);
-  document.getElementById('btnModificarMedico').disabled = false;
-}
-
-// ========================
-// Mostrar detalles del médico reutilizable en filas con línea inferior
-// ========================
-function generarTarjetasDetalle(objeto) {
-  const campos = Object.entries(objeto);
-  let html = '<div class="cita" style="border:2px solid black; border-radius:12px; padding:20px; background:white; box-shadow: var(--shadow-md); transition: transform 0.3s ease; display: flex; flex-wrap: wrap; gap: 30px;">';
-
-  for (let i = 0; i < campos.length; i += 3) {
-    html += '<div style="display:flex; gap: 30px; flex: 1 1 100%;">';
-    for (let j = i; j < i + 3 && j < campos.length; j++) {
-      const [clave, valor] = campos[j];
-      html += `
-        <div style="flex: 1; display: flex; flex-direction: column;">
-          <div style="display: flex; justify-content: flex-start; font-weight: 600;"><span>${capitalizar(clave)}:</span></div>
-          <div style="display: flex;  padding-top: 4px; border-bottom: 1px solid black;">${valor}</div>
+    filtrados.forEach((consultorio, index) => {
+      const div = document.createElement('div');
+      div.classList.add('cita');      div.setAttribute('data-id', consultorio.ID_Consultorio);
+      const color = obtenerColorPorEstatus(consultorio.ID_Estatus);
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display: flex; flex-wrap: wrap; gap: 30px;">
+            <div class="dato"><strong>Nombre:</strong> <span>${consultorio.Nombre_Consultorio || 'Sin nombre'}</span></div>
+            <div class="dato" style="display: flex; align-items: center;"><strong>Estatus:</strong>
+              <span class="estatus-text-wrapper" style="margin-left: 6px; display: flex; align-items: center; gap: 6px;">
+                <span class="circle" style="background:${color}; width:10px; height:10px; border-radius:50%; display:inline-block;"></span>
+                <span class="estatus-text">${consultorio.EstatusNombre || 'Desconocido'}</span>
+              </span>
+            </div>
+          </div>
+          <button class="btn-icon editar-btn" title="Editar estatus">
+            <iconify-icon icon="mdi:pencil" width="20"></iconify-icon>
+          </button>
         </div>
       `;
-    }
-    html += '</div>';
-  }
 
-  html += '</div>';
-  return html;
-}
-
-function capitalizar(texto) {
-  return texto
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, str => str.toUpperCase());
-}
-
-function mostrarDetallesMedico(medico) {
-  const panel = document.getElementById('resultadoMedico');
-  if (!panel) return;
-  panel.innerHTML = generarTarjetasDetalle(medico);
-}
-
-// ========================
-// Inicialización
-// ========================
-document.addEventListener('DOMContentLoaded', function () {
-  if (document.getElementById('listaMedicos')) cargarMedicos();
-  if (document.getElementById('listaConsultorios')) cargarConsultorios();
-
-  const filtros = document.querySelectorAll('.filtro-btn');
-  filtros.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filtros.forEach(b => b.classList.remove('activo'));
-      btn.classList.add('activo');
-      filtroActual = btn.dataset.estatus;
-      cargarConsultorios();
+      div.querySelector('.editar-btn').addEventListener('click', (e) => editarConsultorioFlotante(e, consultorio));
+      lista.appendChild(div);
     });
-  });
-});
+  } catch (error) {
+    console.error('Error al cargar consultorios:', error);
+    lista.innerHTML = `
+      <div class="error-state">
+        <iconify-icon icon="mdi:alert-circle" width="48"></iconify-icon>
+        <p>Error al cargar consultorios: ${error.message}</p>
+        <button class="btn secondary-btn" onclick="cargarConsultorios()">
+          <iconify-icon icon="mdi:refresh"></iconify-icon> Reintentar
+        </button>
+      </div>
+    `;
+  }
+}
+
+// ========================
+// Obtener color por estatus
+// ========================
+function obtenerColorPorEstatus(idEstatus) {
+  // Si no hay ID_Estatus, devolver gris
+  if (!idEstatus) return '#6c757d';
+
+  switch (idEstatus) {
+    case 1: // Disponible
+      return '#28a745';  // Verde
+    case 2: // Ocupado
+      return '#ffc107';  // Amarillo
+    case 3: // En mantenimiento
+      return '#17a2b8';  // Azul
+    default:
+      return '#6c757d';  // Gris por defecto
+  }
+}
 
 // ========================
 // Editar Consultorio flotante
 // ========================
-function editarConsultorioFlotante(event, index) {
-  const consultorio = consultorios[index];
+function editarConsultorioFlotante(event, consultorio) {
   const card = event.target.closest('.cita');
   if (!card) return;
 
@@ -237,14 +121,20 @@ function editarConsultorioFlotante(event, index) {
   contenedor.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
 
   const select = document.createElement('select');
-  select.className = 'estatus-selector';
+  select.className = 'estatus-selector form-control';
   select.style.minWidth = '180px';
+  // Opciones de estatus con sus IDs correspondientes
+  const opcionesEstatus = [
+    { id: 1, nombre: 'Disponible' },
+    { id: 2, nombre: 'Ocupado' },
+    { id: 3, nombre: 'En mantenimiento' },
+  ];
 
-  ['Disponible', 'Ocupado', 'En mantenimiento', 'Dado de baja'].forEach(opcion => {
+  opcionesEstatus.forEach(opcion => {
     const opt = document.createElement('option');
-    opt.value = opcion;
-    opt.textContent = opcion;
-    if (opcion === consultorio.estatus) opt.selected = true;
+    opt.value = opcion.id;
+    opt.textContent = opcion.nombre;
+    if (opcion.id === consultorio.ID_Estatus) opt.selected = true;
     select.appendChild(opt);
   });
 
@@ -252,13 +142,117 @@ function editarConsultorioFlotante(event, index) {
   guardar.textContent = 'Guardar';
   guardar.className = 'btn primary-btn';
   guardar.style.marginTop = '8px';
-  guardar.addEventListener('click', () => {
-    consultorio.estatus = select.value;
-    contenedor.remove();
-    cargarConsultorios();
+  guardar.addEventListener('click', async () => {
+    try {
+      guardar.disabled = true;
+      guardar.innerHTML = '<iconify-icon icon="mdi:loading" class="spin"></iconify-icon> Guardando...';
+      // Actualizar en la API
+      await window.apiService.consultorios.update(consultorio.ID_Consultorio, {
+        Nombre_Consultorio: consultorio.Nombre_Consultorio,
+        ID_Estatus: parseInt(select.value)
+      });
+
+      // Recargar la lista
+      await cargarConsultorios();
+      contenedor.remove();
+      mostrarNotificacion('Estatus actualizado correctamente', 'success');
+    } catch (error) {
+      console.error('Error al actualizar consultorio:', error);
+      mostrarNotificacion(error.message || 'Error al actualizar el estatus', 'error');
+      guardar.disabled = false;
+      guardar.textContent = 'Guardar';
+    }
   });
 
   contenedor.appendChild(select);
   contenedor.appendChild(guardar);
   document.body.appendChild(contenedor);
+
+  // Cerrar al hacer clic fuera
+  document.addEventListener('click', function cerrarSelector(e) {
+    if (!contenedor.contains(e.target) && !event.target.contains(e.target)) {
+      contenedor.remove();
+      document.removeEventListener('click', cerrarSelector);
+    }
+  });
+}
+
+// ========================
+// Registrar nuevo consultorio
+// ========================
+document.addEventListener('DOMContentLoaded', function() {
+  const formConsultorio = document.getElementById('formConsultorio');
+  if (formConsultorio) {
+    formConsultorio.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const nombreConsultorio = document.getElementById('nombreConsultorio').value.trim();
+      if (!nombreConsultorio) {
+        mostrarNotificacion('Por favor ingrese el nombre del consultorio', 'error');
+        return;
+      }
+
+      const submitBtn = formConsultorio.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<iconify-icon icon="mdi:loading" class="spin"></iconify-icon> Guardando...';
+
+      try {
+        // Crear consultorio en la API
+        const response = await window.apiService.consultorios.create({
+          Nombre_Consultorio: nombreConsultorio,
+          ID_Estatus: 1  // 1 = Disponible por defecto
+        });
+
+        if (response) {
+          mostrarNotificacion('Consultorio registrado correctamente', 'success');
+          formConsultorio.reset();
+          
+          // Redireccionar y activar la pestaña correspondiente
+          showPage('hospital');
+          document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('data-page') === 'hospital') {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+
+          // Recargar la lista de consultorios
+          await cargarConsultorios();
+        }
+      } catch (error) {
+        console.error('Error al registrar consultorio:', error);
+        mostrarNotificacion(error.message || 'Error al registrar el consultorio', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Guardar';
+      }
+    });
+  }
+
+  // Configurar filtros
+  const filtros = document.querySelectorAll('.filtro-btn');
+  filtros.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtros.forEach(b => b.classList.remove('activo'));
+      btn.classList.add('activo');
+      filtroActual = btn.dataset.estatus;
+      cargarConsultorios();
+    });
+  });
+
+  // Cargar consultorios inicialmente
+  if (document.getElementById('listaConsultorios')) {
+    cargarConsultorios();
+  }
+});
+
+function mostrarNotificacion(mensaje, tipo = 'info') {
+  // No llamar recursivamente a la función global si tiene el mismo nombre
+  const notificacionGlobal = window.mostrarNotificacion;
+  if (typeof notificacionGlobal === 'function' && notificacionGlobal !== mostrarNotificacion) {
+    notificacionGlobal(mensaje, tipo);
+  } else {
+    alert(mensaje);
+  }
 }

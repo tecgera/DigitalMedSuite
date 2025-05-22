@@ -1,6 +1,7 @@
 using backend.Data;
 using backend.DTOs;
 using backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]  // Require authentication for all endpoints in this controller
     public class UsuariosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -15,32 +17,45 @@ namespace backend.Controllers
         public UsuariosController(ApplicationDbContext context)
         {
             _context = context;
-        }
-
-        // GET: api/Usuarios
+        }        // GET: api/Usuarios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UsuarioDTO>>> GetUsuarios()
         {
-            var usuarios = await _context.Usuarios
-                .Include(u => u.Rol)
-                .Include(u => u.Estatus)
-                .Select(u => new UsuarioDTO
-                {
-                    ID_Usuario = u.ID_Usuario,
-                    Nombre_Usuario = u.Nombre_Usuario,
-                    ID_Rol = u.ID_Rol,
-                    Nombre = u.Nombre,
-                    Apellido_Paterno = u.Apellido_Paterno,
-                    Apellido_Materno = u.Apellido_Materno,
-                    Correo = u.Correo,
-                    Telefono = u.Telefono,
-                    ID_Estatus = u.ID_Estatus,
-                    NombreRol = u.Rol != null ? u.Rol.Nombre_Rol : null,
-                    NombreEstatus = u.Estatus != null ? u.Estatus.Nombre_Estatus : null
-                })
-                .ToListAsync();
+            try
+            {                var usuarios = await _context.Usuarios
+                    .Select(u => new UsuarioDTO
+                    {
+                        ID_Usuario = u.ID_Usuario,
+                        Nombre_Usuario = u.Nombre_Usuario,
+                        ID_Rol = u.ID_Rol,
+                        Nombre = u.Nombre,
+                        Apellido_Paterno = u.Apellido_Paterno,
+                        Apellido_Materno = u.Apellido_Materno,
+                        Correo = u.Correo,
+                        Telefono = u.Telefono,
+                        ID_Estatus = u.ID_Estatus
+                    })
+                    .ToListAsync();
 
-            return usuarios;
+                // Cargar datos relacionados de forma segura
+                foreach (var usuario in usuarios)
+                {
+                    var rol = await _context.Roles.FindAsync(usuario.ID_Rol);
+                    usuario.nombreRol = rol?.Nombre_Rol;
+                    
+                    if (usuario.ID_Estatus.HasValue)
+                    {
+                        var estatus = await _context.EstatusUsuarios.FindAsync(usuario.ID_Estatus.Value);
+                        usuario.nombreEstatus = estatus?.Nombre_Estatus;
+                    }
+                }
+
+                return usuarios;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Error al obtener usuarios", details = ex.Message });
+            }
         }
 
         // GET: api/Usuarios/5
@@ -55,9 +70,7 @@ namespace backend.Controllers
             if (usuario == null)
             {
                 return NotFound();
-            }
-
-            var usuarioDTO = new UsuarioDTO
+            }            var usuarioDTO = new UsuarioDTO
             {
                 ID_Usuario = usuario.ID_Usuario,
                 Nombre_Usuario = usuario.Nombre_Usuario,
@@ -68,20 +81,30 @@ namespace backend.Controllers
                 Correo = usuario.Correo,
                 Telefono = usuario.Telefono,
                 ID_Estatus = usuario.ID_Estatus,
-                NombreRol = usuario.Rol?.Nombre_Rol,
-                NombreEstatus = usuario.Estatus?.Nombre_Estatus
+                nombreRol = usuario.Rol?.Nombre_Rol,
+                nombreEstatus = usuario.Estatus?.Nombre_Estatus
             };
 
             return usuarioDTO;
-        }
-
-        // POST: api/Usuarios
+        }        // POST: api/Usuarios
         [HttpPost]
         public async Task<ActionResult<UsuarioDTO>> CreateUsuario(UsuarioCrearDTO usuarioDTO)
         {
+            // Check if username already exists
+            if (await _context.Usuarios.AnyAsync(u => u.Nombre_Usuario == usuarioDTO.Nombre_Usuario))
+            {
+                return BadRequest(new { message = "Este nombre de usuario ya está en uso" });
+            }
+
+            // Check if email already exists (if provided)
+            if (!string.IsNullOrEmpty(usuarioDTO.Correo) && 
+                await _context.Usuarios.AnyAsync(u => u.Correo == usuarioDTO.Correo))
+            {
+                return BadRequest(new { message = "Este correo electrónico ya está registrado" });
+            }
+
             var usuario = new Usuario
             {
-                ID_Usuario = usuarioDTO.ID_Rol, // Corregir esto según la lógica de tu aplicación
                 Nombre_Usuario = usuarioDTO.Nombre_Usuario,
                 ContrasenaHash = usuarioDTO.ContrasenaHash, // Considerar cifrar antes de guardar
                 ID_Rol = usuarioDTO.ID_Rol,
@@ -90,7 +113,7 @@ namespace backend.Controllers
                 Apellido_Materno = usuarioDTO.Apellido_Materno,
                 Correo = usuarioDTO.Correo,
                 Telefono = usuarioDTO.Telefono,
-                ID_Estatus = usuarioDTO.ID_Estatus,
+                ID_Estatus = usuarioDTO.ID_Estatus ?? 1, // Estado activo por defecto
                 Fecha_Creacion = DateTime.Now
             };
 

@@ -1,0 +1,196 @@
+/* Estilos específicos para el formulario de registro de usuarios */
+
+/* Contenedor del formulario con scroll */
+#registro .container {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding: 20px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Asegurarse de que los campos del formulario tengan estilos consistentes */
+#registro .input-with-icon {
+  position: relative;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+/* Estilos para todos los inputs */
+#registro input[type="text"],
+#registro input[type="email"],
+#registro input[type="password"],
+#registro input[type="tel"],
+#registro select {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3.2rem;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  font-size: 1rem;
+  background-color: var(--secondary-color);
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+}
+
+#registro input:focus,
+#registro select:focus {
+  border-color: var(--primary-light);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(142, 45, 226, 0.2);
+}
+
+#registro .input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-light);
+  font-size: 1.3rem;
+}
+
+#registro .toggle-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.3rem;
+}
+
+/* Estilos para el formulario */
+#registro .login-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0rem;
+  width: 100%;
+}
+
+#registro .login-form .input-with-icon,
+#registro .login-form .form-group {
+  width: 100%;
+}
+
+#registro .login-form button {
+  grid-column: 1 / -1;
+}
+
+/* Estilos para el botón de submit */
+#registro .login-button {
+  background-color: #2c7be5;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+#registro .login-button:hover {
+  background-color: #1a68d1;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(26, 104, 209, 0.3);
+}
+
+/* Estilos para el botón de volver atrás */
+#registro .apartadoBoton {
+  margin-bottom: 20px;
+}
+
+/* Asegurarse que la sección de registro tenga espacio suficiente */
+#registro {
+  padding: 20px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+/* Hacer el formulario más compacto para caber en la pantalla */
+#registro .form-section {
+  padding: 20px;
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+#registro .login-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Sección del logo en el formulario de registro */
+#registro .logo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+#registro .logo {
+  width: 50px;
+  height: 50px;
+}
+
+#registro #head-registro {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+#registro .form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+#registro .form-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Mejorar la legibilidad del formulario */
+#registro label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Mensajes de error */
+#registro .error-message {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+#registro .form-group {
+  margin-bottom: 15px;
+}
+
+/* Media query para pantallas más pequeñas */
+@media (max-width: 992px) {
+  #registro .container {
+    padding: 10px;
+  }
+  
+  #registro .login-form {
+    grid-template-columns: 1fr;
+  }
+  
+  #registro .login-container {
+    padding: 1rem;
+  }
+}
