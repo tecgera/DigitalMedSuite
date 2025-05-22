@@ -161,9 +161,8 @@ const apiService = {
                 console.error('Error deleting consultorio:', error);
                 throw error;
             }
-        }
-    },
-
+        }    },
+    
     // API endpoints for medicos
     medicos: {
         getAll: async () => await apiService.get('Medicos'),
@@ -171,6 +170,14 @@ const apiService = {
         create: async (data) => await apiService.post('Medicos', data),
         update: async (id, data) => await apiService.put(`Medicos/${id}`, data),
         delete: async (id) => await apiService.delete(`Medicos/${id}`)
+    },
+    
+    // API endpoints for catalogos
+    catalogos: {
+        getEstatusCitas: async () => await apiService.get('Catalogos/EstatusCitas'),
+        getRoles: async () => await apiService.get('Catalogos/Roles'),
+        getEstatusUsuarios: async () => await apiService.get('Catalogos/EstatusUsuarios'),
+        getEspecialidades: async () => await apiService.get('Catalogos/Especialidades')
     },
     
     // Check if the API is accessible and the user is authenticated

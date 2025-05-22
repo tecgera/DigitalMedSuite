@@ -1,282 +1,663 @@
-// ========================
-// Datos simulados (ajustables)
-// ========================
-const citasPorFiltro = {
-  hoy: [
-    {
-      nombre: 'Juan Pérez',
-      hora: '09:00 AM',
-      fechaHora: '2025-05-17 09:00',
-      medico: 'Dra. Ramírez',
-      consultorio: 'Consultorio 3',
-      estatus: 'Confirmada',
-      fechaRegistro: '2025-05-01',
-      ultimaActualizacion: '2025-05-15'
-    },
-    {
-      nombre: 'Ana Torres',
-      hora: '10:30 AM',
-      fechaHora: '2025-05-17 10:30',
-      medico: 'Dr. Salas',
-      consultorio: 'Consultorio 1',
-      estatus: 'Pendiente',
-      fechaRegistro: '2025-05-02',
-      ultimaActualizacion: '2025-05-14'
-    },
-    {
-      nombre: 'Luis Mendoza',
-      hora: '11:45 AM',
-      fechaHora: '2025-05-17 11:45',
-      medico: 'Dra. Herrera',
-      consultorio: 'Consultorio 5',
-      estatus: 'Cancelada',
-      fechaRegistro: '2025-05-03',
-      ultimaActualizacion: '2025-05-16'
-    }
-  ],
-  manana: [
-    {
-      nombre: 'Claudia Ramírez',
-      hora: '08:00 AM',
-      fechaHora: '2025-05-18 08:00',
-      medico: 'Dr. Ortega',
-      consultorio: 'Consultorio 2',
-      estatus: 'Confirmada',
-      fechaRegistro: '2025-05-14',
-      ultimaActualizacion: '2025-05-16'
-    },
-    {
-      nombre: 'Roberto Salinas',
-      hora: '09:30 AM',
-      fechaHora: '2025-05-18 09:30',
-      medico: 'Dra. Luna',
-      consultorio: 'Consultorio 4',
-      estatus: 'Pendiente',
-      fechaRegistro: '2025-05-15',
-      ultimaActualizacion: '2025-05-16'
-    }
-  ],
-  semana: [
-    {
-      nombre: 'Daniela Flores',
-      hora: '02:00 PM',
-      fechaHora: '2025-05-19 14:00',
-      medico: 'Dr. Méndez',
-      consultorio: 'Consultorio 6',
-      estatus: 'Confirmada',
-      fechaRegistro: '2025-05-12',
-      ultimaActualizacion: '2025-05-16'
-    },
-    {
-      nombre: 'Miguel Ángel Ruiz',
-      hora: '03:15 PM',
-      fechaHora: '2025-05-20 15:15',
-      medico: 'Dra. Vázquez',
-      consultorio: 'Consultorio 1',
-      estatus: 'Pendiente',
-      fechaRegistro: '2025-05-10',
-      ultimaActualizacion: '2025-05-13'
-    },
-    {
-      nombre: 'Verónica Castillo',
-      hora: '04:45 PM',
-      fechaHora: '2025-05-21 16:45',
-      medico: 'Dr. Palacios',
-      consultorio: 'Consultorio 2',
-      estatus: 'Cancelada',
-      fechaRegistro: '2025-05-09',
-      ultimaActualizacion: '2025-05-16'
-    }
-  ]
-};
+// Wrap entire script in an IIFE to avoid global variable conflicts
+(function() {
+  // ========================
+  // Variables globales
+  // ========================
+  let citasPorFiltro = {
+    hoy: [],
+    manana: [],
+    semana: []
+  };
 
-let citaSeleccionada = null;
-let tipoBusqueda = 'paciente';
+  let todasLasCitas = [];
+  let citaSeleccionada = null;
+  let tipoBusqueda = 'paciente';
+  let filtroActual = 'todos';
 
-// ========================
-// Mostrar listado de citas
-// ========================
-function mostrarListadoCitas(listaDestinoId, citas) {
-  const lista = document.getElementById(listaDestinoId);
-  if (!lista) return;
-  lista.innerHTML = '';
+  // ========================
+  // Cargar citas desde la API
+  // ========================
+  async function cargarCitasDesdeAPI() {
+    try {
+      console.log('Obteniendo citas desde la API...');
+      const citas = await window.apiService.citas.getAll();
+      console.log('Citas recibidas:', citas);
 
-  if (citas.length === 0) {
-    lista.innerHTML = `
-      <div class="empty-state">
-        <iconify-icon icon="mdi:calendar-blank" width="48"></iconify-icon>
-        <p>No hay citas programadas para este período</p>
-      </div>`;
-    return;
+      // Reiniciar el objeto de citasPorFiltro
+      citasPorFiltro = {
+        hoy: [],
+        manana: [],
+        semana: []
+      };
+
+      // Guardar todas las citas
+      todasLasCitas = [...citas];
+
+      // Obtener las fechas para cada filtro
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      
+      const manana = new Date(hoy);
+      manana.setDate(manana.getDate() + 1);
+      
+      const finSemana = new Date(hoy);
+      finSemana.setDate(finSemana.getDate() + 7);
+
+      // Clasificar las citas según su fecha
+      citas.forEach(cita => {
+        // Convertir la fecha de la cita a un objeto Date
+        const fechaCita = new Date(cita.fecha_Cita);
+        fechaCita.setHours(0, 0, 0, 0);
+
+        // Formatear la hora para mostrar
+        const hora = new Date(`2000-01-01T${cita.hora_Cita}`);
+        const horaFormateada = hora.toLocaleTimeString('es-ES', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+
+        // Crear objeto de cita con formato para mostrar
+        const citaFormateada = {
+          id: cita.id_Cita,
+          nombre: `${cita.nombrePaciente || ''} ${cita.apellidoPaciente || ''}`.trim(),
+          hora: horaFormateada,
+          fechaHora: `${new Date(cita.fecha_Cita).toLocaleDateString('es-ES')} ${horaFormateada}`,
+          medico: `Dr(a). ${cita.nombreMedico || ''} ${cita.apellidoMedico || ''}`.trim(),
+          consultorio: cita.nombreConsultorio || 'No asignado',
+          estatus: cita.estatusNombre || 'Pendiente',
+          fechaRegistro: new Date(cita.fecha_Creacion).toLocaleDateString('es-ES'),
+          ultimaActualizacion: new Date(cita.ultima_Actualizacion).toLocaleDateString('es-ES'),
+          // Guardar los IDs para operaciones de edición/eliminación
+          id_Paciente: cita.id_Paciente,
+          id_Medico: cita.id_Medico,
+          id_Consultorio: cita.id_Consultorio,
+          id_Estatus: cita.id_Estatus,
+          fecha_Cita: cita.fecha_Cita,
+          hora_Cita: cita.hora_Cita
+        };
+
+        // Clasificar según la fecha
+        if (fechaCita.getTime() === hoy.getTime()) {
+          citasPorFiltro.hoy.push(citaFormateada);
+        } else if (fechaCita.getTime() === manana.getTime()) {
+          citasPorFiltro.manana.push(citaFormateada);
+        } else if (fechaCita > hoy && fechaCita < finSemana) {
+          citasPorFiltro.semana.push(citaFormateada);
+        }
+      });
+
+      console.log('Citas clasificadas:', citasPorFiltro);
+      return true;
+    } catch (error) {
+      console.error('Error al cargar las citas:', error);
+      alert('Ocurrió un error al cargar las citas. Por favor, intente nuevamente.');
+      return false;
+    }
   }
 
-  citas.forEach((cita, index) => {
-    const div = document.createElement('div');
-    div.classList.add('cita');
-    div.setAttribute('data-index', index);
+  // ========================
+  // Mostrar listado de citas
+  // ========================
+  function mostrarListadoCitas(listaDestinoId, citas) {
+    const lista = document.getElementById(listaDestinoId);
+    if (!lista) return;
+    lista.innerHTML = '';
 
-    div.innerHTML = `
-      <div class="dato"><strong>Nombre:</strong> <span>${cita.nombre}</span></div>
-      <div class="dato"><strong>Hora:</strong> <span>${cita.hora}</span></div>
-      <div class="dato"><strong>Médico Asignado:</strong> <span>${cita.medico}</span></div>
-    `;
+    if (citas.length === 0) {
+      lista.innerHTML = `
+        <div class="empty-state">
+          <iconify-icon icon="mdi:calendar-blank" width="48"></iconify-icon>
+          <p>No hay citas programadas para este período</p>
+        </div>`;
+      return;
+    }
 
-    div.addEventListener('click', () => {
-      seleccionarCita(div, cita);
-      const botonModificar = document.getElementById('btnModificarCita');
-      if (botonModificar) botonModificar.disabled = false;
+    citas.forEach((cita, index) => {
+      const div = document.createElement('div');
+      div.classList.add('cita');
+      div.setAttribute('data-index', index);
+      div.setAttribute('data-id', cita.id);
+
+      // Añadir un indicador de estado visual
+      const statusClass = getStatusClass(cita.estatus);
+
+      div.innerHTML = `
+        <div class="dato"><strong>Nombre:</strong> <span>${cita.nombre}</span></div>
+        <div class="dato"><strong>Hora:</strong> <span>${cita.hora}</span></div>
+        <div class="dato"><strong>Médico Asignado:</strong> <span>${cita.medico}</span></div>
+        <div class="estado ${statusClass}"><span>${cita.estatus}</span></div>
+      `;
+
+      div.addEventListener('click', () => {
+        seleccionarCita(div, cita);
+        const botonModificar = document.getElementById('btnModificarCita');
+        const botonEliminar = document.getElementById('btnEliminarCita');
+        if (botonModificar) botonModificar.disabled = false;
+        if (botonEliminar) botonEliminar.disabled = false;
+      });
+
+      lista.appendChild(div);
+    });
+  }
+
+  // Obtener clase CSS según el estado de la cita
+  function getStatusClass(estatus) {
+    const estado = estatus ? estatus.toLowerCase() : '';
+    
+    if (estado.includes('confirmada')) return 'confirmada';
+    if (estado.includes('pendiente')) return 'pendiente';
+    if (estado.includes('cancelada')) return 'cancelada';
+    if (estado.includes('completada')) return 'completada';
+    
+    return 'pendiente'; // Estado por defecto
+  }
+
+  // ========================
+  // Cargar citas por filtro
+  // ========================
+  function cargarCitas(filtro = 'todos', destino = 'listaCitas') {
+    filtroActual = filtro; // Actualizar variable global
+    let citas = [];
+
+    if (filtro === 'todos') {
+      citas = Object.values(citasPorFiltro).flat();
+    } else {
+      citas = citasPorFiltro[filtro] || [];
+    }
+
+    console.log(`Cargando citas para filtro "${filtro}"`, citas);
+    mostrarListadoCitas(destino, citas);
+  }
+
+  // ========================
+  // Selección de cita
+  // ========================
+  function seleccionarCita(elemento, datos) {
+    document.querySelectorAll('.cita').forEach(c => c.classList.remove('seleccionada'));
+    elemento.classList.add('seleccionada');
+    citaSeleccionada = datos;
+    mostrarCitaSeleccionada(datos);
+  }
+
+  // ========================
+  // Mostrar detalles de cita
+  // ========================
+  function mostrarCitaSeleccionada(cita) {
+    const panel = document.getElementById('resultadoCita');
+    if (!panel) return;
+
+    panel.innerHTML = `
+    <div class="tarjeta" style="border: 2px solid black; border-radius: 12px; padding: 24px; background: white; display: flex; flex-direction: column; gap: 20px;">
+      
+      <div style="width: 100%; padding-bottom: 8px; margin-bottom: 12px; border-bottom: 2px solid black;">
+        <h3 style="font-size: 1.5rem; font-weight: bold; margin: 0;">
+          Detalles de la Cita:
+        </h3>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 40px;">
+        ${[
+          ['ID de Cita', cita.id || 'N/D'],
+          ['Paciente', cita.nombre],
+          ['Médico Asignado', cita.medico],
+          ['Fecha y Hora', cita.fechaHora || cita.hora || 'No especificada'],
+          ['Consultorio', cita.consultorio || 'N/D'],
+          ['Estatus', `<span class="${getStatusClass(cita.estatus)}">${cita.estatus || 'Pendiente'}</span>`],
+          ['Fecha de Registro', cita.fechaRegistro || 'N/D'],
+          ['Última Actualización', cita.ultimaActualizacion || 'N/D']
+        ].map(([label, valor]) => `
+          <div style="flex: 1 1 240px; min-width: 220px;">
+            <label style="font-weight: bold;">${label}:</label>
+            <div style="border-bottom: 1px solid black; padding: 2px 0;">${valor}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="botones-accion" style="display: flex; justify-content: flex-end; margin-top: 16px; gap: 10px;">
+        <button id="btnEditarCitaDetalle" class="boton primario">
+          <iconify-icon icon="mdi:pencil"></iconify-icon> Editar
+        </button>
+        <button id="btnEliminarCitaDetalle" class="boton secundario">
+          <iconify-icon icon="mdi:delete"></iconify-icon> Eliminar
+        </button>
+      </div>
+    </div>
+  `;
+
+    // Configurar botones de acción en los detalles
+    document.getElementById('btnEditarCitaDetalle')?.addEventListener('click', () => {
+      abrirModalEditarCita(cita);
     });
 
-    lista.appendChild(div);
-  });
-}
-
-// ========================
-// Cargar citas por filtro
-// ========================
-function cargarCitas(filtro = 'todos', destino = 'listaCitas') {
-  let citas = [];
-
-  if (filtro === 'todos') {
-    citas = Object.values(citasPorFiltro).flat();
-  } else {
-    citas = citasPorFiltro[filtro] || [];
+    document.getElementById('btnEliminarCitaDetalle')?.addEventListener('click', () => {
+      confirmarEliminarCita(cita);
+    });
   }
 
-  mostrarListadoCitas(destino, citas);
-}
-
-// ========================
-// Selección de cita
-// ========================
-function seleccionarCita(elemento, datos) {
-  document.querySelectorAll('.cita').forEach(c => c.classList.remove('seleccionada'));
-  elemento.classList.add('seleccionada');
-  citaSeleccionada = datos;
-  mostrarCitaSeleccionada(datos);
-}
-
-// ========================
-// Mostrar detalles de cita
-// ========================
-function mostrarCitaSeleccionada(cita) {
-  const panel = document.getElementById('resultadoCita');
-  if (!panel) return;
-
-  panel.innerHTML = `
-  <div class="tarjeta" style="border: 2px solid black; border-radius: 12px; padding: 24px; background: white; display: flex; flex-direction: column; gap: 20px;">
+  // ========================
+  // Búsqueda de cita
+  // ========================
+  function buscarCita() {
+    const input = document.getElementById('busquedaCita');
+    const panel = document.getElementById('resultadoCita');
+    const botonModificar = document.getElementById('btnModificarCita');
+    const botonEliminar = document.getElementById('btnEliminarCita');
     
-    <div style="width: 100%; padding-bottom: 8px; margin-bottom: 12px; border-bottom: 2px solid black;">
-      <h3 style="font-size: 1.5rem; font-weight: bold; margin: 0;">
-        Detalles de la Cita:
-      </h3>
-    </div>
+    if (!input || !panel) return;
 
-    <div style="display: flex; flex-wrap: wrap; gap: 40px;">
-      ${[
-        ['Paciente', cita.nombre],
-        ['Médico Asignado', cita.medico],
-        ['Fecha y Hora', cita.fechaHora || cita.hora || 'No especificada'],
-        ['Consultorio', cita.consultorio || 'N/D'],
-        ['Estatus', cita.estatus || 'Pendiente'],
-        ['Fecha de Registro', cita.fechaRegistro || 'N/D'],
-        ['Última Actualización', cita.ultimaActualizacion || 'N/D']
-      ].map(([label, valor]) => `
-        <div style="flex: 1 1 240px; min-width: 220px;">
-          <label style="font-weight: bold;">${label}:</label>
-          <div style="border-bottom: 1px solid black; padding: 2px 0;">${valor}</div>
-        </div>
-      `).join('')}
-    </div>
+    const texto = input.value.trim().toLowerCase();
+    const todas = Object.values(citasPorFiltro).flat();
+      
+    let resultado = null;
 
-  </div>
-`;
+    if (tipoBusqueda === 'paciente') {
+      resultado = todas.find(cita => cita.nombre.toLowerCase().includes(texto));
+    } else if (tipoBusqueda === 'medico') {
+      resultado = todas.find(cita => cita.medico.toLowerCase().includes(texto));
+    }
 
-}
-
-// ========================
-// Búsqueda de cita
-// ========================
-function buscarCita() {
-  const input = document.getElementById('busquedaCita');
-  const panel = document.getElementById('resultadoCita');
-  const botonModificar = document.getElementById('btnModificarCita');
-  if (!input || !panel || !botonModificar) return;
-
-  const texto = input.value.trim().toLowerCase();
-  const todas = Object.values(citasPorFiltro).flat();
-  let resultado = null;
-
-  if (tipoBusqueda === 'paciente') {
-    resultado = todas.find(cita => cita.nombre.toLowerCase().includes(texto));
-  } else if (tipoBusqueda === 'medico') {
-    resultado = todas.find(cita => cita.medico.toLowerCase().includes(texto));
+    if (resultado) {
+      mostrarCitaSeleccionada(resultado);
+      citaSeleccionada = resultado;
+      if (botonModificar) botonModificar.disabled = false;
+      if (botonEliminar) botonEliminar.disabled = false;
+    } else {
+      panel.innerHTML = `<p>No se encontró ninguna coincidencia.</p>`;
+      if (botonModificar) botonModificar.disabled = true;
+      if (botonEliminar) botonEliminar.disabled = true;
+    }
   }
 
-  if (resultado) {
-    mostrarCitaSeleccionada(resultado);
-    citaSeleccionada = resultado;
-    botonModificar.disabled = false;
-  } else {
-    panel.innerHTML = `<p>No se encontró ninguna coincidencia.</p>`;
-    botonModificar.disabled = true;
-  }
-}
+  // ========================
+  // Eliminar Cita
+  // ========================
+  function confirmarEliminarCita(cita) {
+    if (!cita || !cita.id) {
+      alert('No se ha seleccionado una cita válida para eliminar.');
+      return;
+    }
 
-// ========================
-// Inicialización general
-// ========================
-document.addEventListener('DOMContentLoaded', function () {
-  // Cargar citas del módulo
-  if (document.getElementById('listaCitas')) {
-    cargarCitas('todos');
-    document.querySelectorAll('.filtro-fecha').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filtro-fecha').forEach(b => b.classList.remove('activo'));
-        btn.classList.add('activo');
-        const filtro = btn.getAttribute('data-filtro');
-        cargarCitas(filtro);
-        document.getElementById('resultadoCita').innerHTML = `
+    if (confirm(`¿Está seguro que desea eliminar la cita de ${cita.nombre}?`)) {
+      eliminarCita(cita.id);
+    }
+  }
+
+  async function eliminarCita(idCita) {
+    try {
+      console.log('Eliminando cita:', idCita);
+      const resultado = await window.apiService.citas.delete(idCita);
+      console.log('Resultado de eliminación:', resultado);
+      
+      alert('La cita ha sido eliminada con éxito.');
+      
+      // Recargar los datos y actualizar la interfaz
+      await cargarCitasDesdeAPI();
+      cargarCitas(filtroActual);
+      
+      // Limpiar el panel de detalles
+      const panel = document.getElementById('resultadoCita');
+      if (panel) {
+        panel.innerHTML = `
           <div class="empty-state">
             <iconify-icon icon="mdi:calendar-search" width="48"></iconify-icon>
             <p>Seleccione una cita para ver los detalles</p>
           </div>`;
-        const botonModificar = document.getElementById('btnModificarCita');
-        if (botonModificar) botonModificar.disabled = true;
-      });
-    });
+      }
+      
+      // Deshabilitar botones
+      const botonModificar = document.getElementById('btnModificarCita');
+      const botonEliminar = document.getElementById('btnEliminarCita');
+      if (botonModificar) botonModificar.disabled = true;
+      if (botonEliminar) botonEliminar.disabled = true;
+      
+      citaSeleccionada = null;
+    } catch (error) {
+      console.error('Error al eliminar la cita:', error);
+      alert('Ocurrió un error al eliminar la cita. Por favor, intente nuevamente.');
+    }
+  }
 
-    // Buscar por enter
-    const inputBusqueda = document.getElementById('busquedaCita');
-    if (inputBusqueda) {
-      inputBusqueda.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          buscarCita();
+  // ========================
+  // Editar Cita - Modal
+  // ========================
+  async function abrirModalEditarCita(cita) {
+    try {
+      if (!cita || !cita.id) {
+        alert('No se ha seleccionado una cita válida para editar.');
+        return;
+      }
+
+      // Obtener datos necesarios para el formulario
+      const doctores = await window.apiService.medicos.getAll();
+      const consultorios = await window.apiService.consultorios.getAll();
+      const estatusCitas = await window.apiService.catalogos.getEstatusCitas();
+
+      // Crear modal
+      const modal = document.createElement('div');
+      modal.classList.add('modal');
+      modal.innerHTML = `
+        <div class="modal-contenido">
+          <div class="modal-cabecera">
+            <h3>Editar Cita</h3>
+            <button class="cerrar-modal">&times;</button>
+          </div>
+          <div class="modal-cuerpo">
+            <form id="formEditarCita">
+              <input type="hidden" id="idCita" value="${cita.id}">
+              
+              <div class="campo">
+                <label for="editPaciente">Paciente:</label>
+                <input type="text" id="editPaciente" value="${cita.nombre}" readonly>
+                <input type="hidden" id="idPaciente" value="${cita.id_Paciente}">
+              </div>
+              
+              <div class="campo">
+                <label for="editMedico">Médico:</label>
+                <select id="editMedico" required>
+                  <option value="">Seleccione un médico...</option>
+                  ${doctores.map(doctor => {
+                    const id = doctor.id_Medico || doctor.ID_Medico;
+                    const nombre = doctor.nombre || doctor.Nombre || '';
+                    const apellido = doctor.apellido_Paterno || doctor.Apellido_Paterno || '';
+                    return `<option value="${id}" ${id == cita.id_Medico ? 'selected' : ''}>
+                      Dr(a). ${nombre} ${apellido}
+                    </option>`;
+                  }).join('')}
+                </select>
+              </div>
+              
+              <div class="campo">
+                <label for="editConsultorio">Consultorio:</label>
+                <select id="editConsultorio" required>
+                  <option value="">Seleccione un consultorio...</option>
+                  ${consultorios.map(consultorio => {
+                    const id = consultorio.id_Consultorio || consultorio.ID_Consultorio;
+                    const nombre = consultorio.nombre_Consultorio || consultorio.Nombre_Consultorio || `Consultorio ${id}`;
+                    return `<option value="${id}" ${id == cita.id_Consultorio ? 'selected' : ''}>
+                      ${nombre}
+                    </option>`;
+                  }).join('')}
+                </select>
+              </div>
+              
+              <div class="campo">
+                <label for="editFecha">Fecha:</label>
+                <input type="date" id="editFecha" value="${cita.fecha_Cita ? cita.fecha_Cita.split('T')[0] : ''}" required>
+              </div>
+              
+              <div class="campo">
+                <label for="editHora">Hora:</label>
+                <input type="time" id="editHora" value="${cita.hora_Cita ? cita.hora_Cita.substring(0, 5) : ''}" required>
+              </div>
+              
+              <div class="campo">
+                <label for="editEstatus">Estado:</label>
+                <select id="editEstatus" required>
+                  <option value="">Seleccione un estado...</option>
+                  ${estatusCitas.map(estatus => {
+                    const id = estatus.ID_Estatus || estatus.id_Estatus;
+                    const nombre = estatus.Nombre_Estatus || estatus.nombre_Estatus || '';
+                    return `<option value="${id}" ${id == cita.id_Estatus ? 'selected' : ''}>
+                      ${nombre}
+                    </option>`;
+                  }).join('')}
+                </select>
+              </div>
+              
+              <div class="botones">
+                <button type="submit" class="boton primario">Guardar Cambios</button>
+                <button type="button" class="boton secundario cancelar-modal">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+
+      // Añadir modal al documento
+      document.body.appendChild(modal);
+
+      // Estilo para el modal
+      const style = document.createElement('style');
+      style.textContent = `
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+        
+        .modal-contenido {
+          background-color: white;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 500px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-cabecera {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          border-bottom: 1px solid #ddd;
+        }
+        
+        .modal-cabecera h3 {
+          margin: 0;
+        }
+        
+        .cerrar-modal {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+        }
+        
+        .modal-cuerpo {
+          padding: 1rem;
+        }
+        
+        .campo {
+          margin-bottom: 1rem;
+        }
+        
+        .campo label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: bold;
+        }
+        
+        .campo input, .campo select {
+          width: 100%;
+          padding: 0.5rem;
+          border-radius: 4px;
+          border: 1px solid #ddd;
+        }
+        
+        .botones {
+          display: flex;
+          justify-content: flex-end;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+        
+        .estado.confirmada {
+          color: green;
+        }
+        
+        .estado.pendiente {
+          color: orange;
+        }
+        
+        .estado.cancelada {
+          color: red;
+        }
+        
+        .estado.completada {
+          color: blue;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // Configurar eventos
+      const cerrarModal = () => {
+        document.body.removeChild(modal);
+        document.head.removeChild(style);
+      };
+
+      modal.querySelector('.cerrar-modal').addEventListener('click', cerrarModal);
+      modal.querySelector('.cancelar-modal').addEventListener('click', cerrarModal);
+
+      // Manejar envío del formulario
+      modal.querySelector('#formEditarCita').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Obtener valores del formulario
+        const datosActualizados = {
+          ID_Medico: parseInt(document.getElementById('editMedico').value),
+          ID_Consultorio: parseInt(document.getElementById('editConsultorio').value),
+          Fecha_Cita: document.getElementById('editFecha').value,
+          Hora_Cita: document.getElementById('editHora').value + ':00',
+          ID_Estatus: parseInt(document.getElementById('editEstatus').value)
+        };
+        
+        try {
+          // Enviar datos a la API
+          const idCita = parseInt(document.getElementById('idCita').value);
+          const resultado = await window.apiService.citas.update(idCita, datosActualizados);
+          console.log('Cita actualizada:', resultado);
+          
+          alert('La cita ha sido actualizada con éxito.');
+          cerrarModal();
+          
+          // Recargar los datos y actualizar la interfaz
+          await cargarCitasDesdeAPI();
+          cargarCitas(filtroActual);
+          
+          // Limpiar selección
+          citaSeleccionada = null;
+          document.getElementById('resultadoCita').innerHTML = `
+            <div class="empty-state">
+              <iconify-icon icon="mdi:calendar-search" width="48"></iconify-icon>
+              <p>Seleccione una cita para ver los detalles</p>
+            </div>`;
+          
+          // Deshabilitar botones
+          const botonModificar = document.getElementById('btnModificarCita');
+          const botonEliminar = document.getElementById('btnEliminarCita');
+          if (botonModificar) botonModificar.disabled = true;
+          if (botonEliminar) botonEliminar.disabled = true;
+        } catch (error) {
+          console.error('Error al actualizar la cita:', error);
+          alert('Ocurrió un error al actualizar la cita. Por favor, intente nuevamente.');
         }
       });
+    } catch (error) {
+      console.error('Error al abrir el modal de edición:', error);
+      alert('Ocurrió un error al cargar el formulario de edición. Por favor, intente nuevamente.');
     }
-
-    // Botón buscar manual
-    const btnBuscar = document.getElementById('btnBuscar');
-    if (btnBuscar) {
-      btnBuscar.addEventListener('click', buscarCita);
-    }
-
-    // Alternar filtro de búsqueda
-    const filtrosBusqueda = document.querySelectorAll('.filter-option');
-    filtrosBusqueda.forEach(filtro => {
-      filtro.addEventListener('click', () => {
-        filtrosBusqueda.forEach(f => f.classList.remove('activo'));
-        filtro.classList.add('activo');
-        tipoBusqueda = filtro.getAttribute('data-filtro');
-      });
-    });
   }
 
-  // Dashboard: solo mostrar citas de hoy
-  const contenedorCitasHome = document.getElementById('citasListaHoy');
-  if (contenedorCitasHome) {
-    mostrarListadoCitas('citasListaHoy', citasPorFiltro.hoy);
-  }
-});
+  // ========================
+  // Inicialización general
+  // ========================
+  document.addEventListener('DOMContentLoaded', async function () {
+    console.log('DOM cargado, inicializando módulo de citas');
+    
+    try {
+      // Cargar citas desde la API
+      const citasCargadas = await cargarCitasDesdeAPI();
+      console.log('¿Se cargaron las citas?', citasCargadas);
+      
+      // Cargar citas del módulo
+      if (document.getElementById('listaCitas')) {
+        cargarCitas('todos');
+        
+        // Configurar botones de filtro
+        document.querySelectorAll('.filtro-fecha').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.filtro-fecha').forEach(b => b.classList.remove('activo'));
+            btn.classList.add('activo');
+            const filtro = btn.getAttribute('data-filtro');
+            cargarCitas(filtro);
+            document.getElementById('resultadoCita').innerHTML = `
+              <div class="empty-state">
+                <iconify-icon icon="mdi:calendar-search" width="48"></iconify-icon>
+                <p>Seleccione una cita para ver los detalles</p>
+              </div>`;
+            const botonModificar = document.getElementById('btnModificarCita');
+            const botonEliminar = document.getElementById('btnEliminarCita');
+            if (botonModificar) botonModificar.disabled = true;
+            if (botonEliminar) botonEliminar.disabled = true;
+          });
+        });
+
+        // Buscar por enter
+        const inputBusqueda = document.getElementById('busquedaCita');
+        if (inputBusqueda) {
+          inputBusqueda.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              buscarCita();
+            }
+          });
+        }
+
+        // Botón buscar manual
+        const btnBuscar = document.getElementById('btnBuscar');
+        if (btnBuscar) {
+          btnBuscar.addEventListener('click', buscarCita);
+        }
+
+        // Alternar filtro de búsqueda
+        const filtrosBusqueda = document.querySelectorAll('.filter-option');
+        filtrosBusqueda.forEach(filtro => {
+          filtro.addEventListener('click', () => {
+            filtrosBusqueda.forEach(f => f.classList.remove('activo'));
+            filtro.classList.add('activo');
+            tipoBusqueda = filtro.getAttribute('data-filtro');
+          });
+        });
+        
+        // Configurar botón modificar
+        const btnModificar = document.getElementById('btnModificarCita');
+        if (btnModificar) {
+          btnModificar.addEventListener('click', () => {
+            if (citaSeleccionada) {
+              abrirModalEditarCita(citaSeleccionada);
+            } else {
+              alert('Por favor, seleccione una cita para modificar.');
+            }
+          });
+        }
+        
+        // Configurar botón eliminar
+        const btnEliminar = document.getElementById('btnEliminarCita');
+        if (btnEliminar) {
+          btnEliminar.addEventListener('click', () => {
+            if (citaSeleccionada) {
+              confirmarEliminarCita(citaSeleccionada);
+            } else {
+              alert('Por favor, seleccione una cita para eliminar.');
+            }
+          });
+        }
+      }
+
+      // Dashboard: solo mostrar citas de hoy
+      const contenedorCitasHome = document.getElementById('citasListaHoy');
+      if (contenedorCitasHome) {
+        console.log('Mostrando citas de hoy en dashboard:', citasPorFiltro.hoy);
+        mostrarListadoCitas('citasListaHoy', citasPorFiltro.hoy);
+      }
+    } catch (error) {
+      console.error('Error en inicialización del módulo de citas:', error);
+    }
+  });
+})(); // Cierre correcto del IIFE
