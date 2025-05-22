@@ -1,18 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using backend.Data;
+using backend.DTOs;
+using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using backend.Data;
-using backend.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Route("api/[controller]")]
     public class PacientesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -32,7 +27,7 @@ namespace backend.Controllers
                 .Include(p => p.Operacion)
                 .Include(p => p.Padecimiento)
                 .Include(p => p.Genero)
-                .Include(p => p.EstatusPaciente)
+                .Include(p => p.Estatus)
                 .Select(p => new PacienteDTO
                 {
                     ID_Paciente = p.ID_Paciente,
@@ -48,19 +43,19 @@ namespace backend.Controllers
                     Altura = p.Altura,
                     Peso = p.Peso,
                     ID_Tipo = p.ID_Tipo,
-                    TipoSangre = p.TipoSangre != null ? p.TipoSangre.Tipo_Sangre : null,
+                    TipoSangreNombre = p.TipoSangre != null ? p.TipoSangre.Tipo_Sangre : null,
                     ID_Alergias = p.ID_Alergias,
-                    Alergia = p.Alergia != null ? p.Alergia.Nombre_Alergia : null,
+                    AlergiaNombre = p.Alergia != null ? p.Alergia.Nombre_Alergia : null,
                     ID_Operaciones = p.ID_Operaciones,
-                    Operacion = p.Operacion != null ? p.Operacion.Nombre_Operacion : null,
+                    OperacionNombre = p.Operacion != null ? p.Operacion.Nombre_Operacion : null,
                     ID_Padecimientos = p.ID_Padecimientos,
-                    Padecimiento = p.Padecimiento != null ? p.Padecimiento.Nombre_Padecimiento : null,
+                    PadecimientoNombre = p.Padecimiento != null ? p.Padecimiento.Nombre_Padecimiento : null,
                     ID_Genero = p.ID_Genero,
-                    Genero = p.Genero != null ? p.Genero.Genero_Nombre : null,
-                    CURP = p.CURP,
+                    GeneroNombre = p.Genero != null ? p.Genero.Genero_Nombre : null,
                     Fecha_Registro = p.Fecha_Registro,
                     ID_Estatus = p.ID_Estatus,
-                    Estatus = p.EstatusPaciente != null ? p.EstatusPaciente.Nombre_Estatus : null
+                    EstatusNombre = p.Estatus != null ? p.Estatus.Nombre_Estatus : null,
+                    CURP = p.CURP
                 })
                 .ToListAsync();
 
@@ -77,92 +72,84 @@ namespace backend.Controllers
                 .Include(p => p.Operacion)
                 .Include(p => p.Padecimiento)
                 .Include(p => p.Genero)
-                .Include(p => p.EstatusPaciente)
-                .Where(p => p.ID_Paciente == id)
-                .Select(p => new PacienteDTO
-                {
-                    ID_Paciente = p.ID_Paciente,
-                    Nombre = p.Nombre,
-                    Apellido_Paterno = p.Apellido_Paterno,
-                    Apellido_Materno = p.Apellido_Materno,
-                    Fecha_Nacimiento = p.Fecha_Nacimiento,
-                    Calle = p.Calle,
-                    Codigo_Postal = p.Codigo_Postal,
-                    Num_Calle = p.Num_Calle,
-                    Correo_Electronico = p.Correo_Electronico,
-                    Telefono = p.Telefono,
-                    Altura = p.Altura,
-                    Peso = p.Peso,
-                    ID_Tipo = p.ID_Tipo,
-                    TipoSangre = p.TipoSangre != null ? p.TipoSangre.Tipo_Sangre : null,
-                    ID_Alergias = p.ID_Alergias,
-                    Alergia = p.Alergia != null ? p.Alergia.Nombre_Alergia : null,
-                    ID_Operaciones = p.ID_Operaciones,
-                    Operacion = p.Operacion != null ? p.Operacion.Nombre_Operacion : null,
-                    ID_Padecimientos = p.ID_Padecimientos,
-                    Padecimiento = p.Padecimiento != null ? p.Padecimiento.Nombre_Padecimiento : null,
-                    ID_Genero = p.ID_Genero,
-                    Genero = p.Genero != null ? p.Genero.Genero_Nombre : null,
-                    CURP = p.CURP,
-                    Fecha_Registro = p.Fecha_Registro,
-                    ID_Estatus = p.ID_Estatus,
-                    Estatus = p.EstatusPaciente != null ? p.EstatusPaciente.Nombre_Estatus : null
-                })
-                .FirstOrDefaultAsync();
+                .Include(p => p.Estatus)
+                .FirstOrDefaultAsync(p => p.ID_Paciente == id);
 
             if (paciente == null)
             {
                 return NotFound();
             }
 
-            return paciente;
+            var pacienteDTO = new PacienteDTO
+            {
+                ID_Paciente = paciente.ID_Paciente,
+                Nombre = paciente.Nombre,
+                Apellido_Paterno = paciente.Apellido_Paterno,
+                Apellido_Materno = paciente.Apellido_Materno,
+                Fecha_Nacimiento = paciente.Fecha_Nacimiento,
+                Calle = paciente.Calle,
+                Codigo_Postal = paciente.Codigo_Postal,
+                Num_Calle = paciente.Num_Calle,
+                Correo_Electronico = paciente.Correo_Electronico,
+                Telefono = paciente.Telefono,
+                Altura = paciente.Altura,
+                Peso = paciente.Peso,
+                ID_Tipo = paciente.ID_Tipo,
+                TipoSangreNombre = paciente.TipoSangre?.Tipo_Sangre,
+                ID_Alergias = paciente.ID_Alergias,
+                AlergiaNombre = paciente.Alergia?.Nombre_Alergia,
+                ID_Operaciones = paciente.ID_Operaciones,
+                OperacionNombre = paciente.Operacion?.Nombre_Operacion,
+                ID_Padecimientos = paciente.ID_Padecimientos,
+                PadecimientoNombre = paciente.Padecimiento?.Nombre_Padecimiento,
+                ID_Genero = paciente.ID_Genero,
+                GeneroNombre = paciente.Genero?.Genero_Nombre,
+                Fecha_Registro = paciente.Fecha_Registro,
+                ID_Estatus = paciente.ID_Estatus,
+                EstatusNombre = paciente.Estatus?.Nombre_Estatus,
+                CURP = paciente.CURP
+            };
+
+            return pacienteDTO;
         }
 
         // POST: api/Pacientes
         [HttpPost]
-        public async Task<ActionResult<PacienteDTO>> PostPaciente(CreatePacienteDTO createPacienteDto)
+        public async Task<ActionResult<PacienteDTO>> CreatePaciente(PacienteCrearDTO pacienteDTO)
         {
             var paciente = new Paciente
             {
-                Nombre = createPacienteDto.Nombre,
-                Apellido_Paterno = createPacienteDto.Apellido_Paterno,
-                Apellido_Materno = createPacienteDto.Apellido_Materno,
-                Fecha_Nacimiento = createPacienteDto.Fecha_Nacimiento,
-                Calle = createPacienteDto.Calle,
-                Codigo_Postal = createPacienteDto.Codigo_Postal,
-                Num_Calle = createPacienteDto.Num_Calle,
-                Correo_Electronico = createPacienteDto.Correo_Electronico,
-                Telefono = createPacienteDto.Telefono,
-                Altura = createPacienteDto.Altura,
-                Peso = createPacienteDto.Peso,
-                ID_Tipo = createPacienteDto.ID_Tipo,
-                ID_Alergias = createPacienteDto.ID_Alergias,
-                ID_Operaciones = createPacienteDto.ID_Operaciones,
-                ID_Padecimientos = createPacienteDto.ID_Padecimientos,
-                ID_Genero = createPacienteDto.ID_Genero,
-                CURP = createPacienteDto.CURP,
+                ID_Paciente = pacienteDTO.ID_Paciente,
+                Nombre = pacienteDTO.Nombre,
+                Apellido_Paterno = pacienteDTO.Apellido_Paterno,
+                Apellido_Materno = pacienteDTO.Apellido_Materno,
+                Fecha_Nacimiento = pacienteDTO.Fecha_Nacimiento,
+                Calle = pacienteDTO.Calle,
+                Codigo_Postal = pacienteDTO.Codigo_Postal,
+                Num_Calle = pacienteDTO.Num_Calle,
+                Correo_Electronico = pacienteDTO.Correo_Electronico,
+                Telefono = pacienteDTO.Telefono,
+                Altura = pacienteDTO.Altura,
+                Peso = pacienteDTO.Peso,
+                ID_Tipo = pacienteDTO.ID_Tipo,
+                ID_Alergias = pacienteDTO.ID_Alergias,
+                ID_Operaciones = pacienteDTO.ID_Operaciones,
+                ID_Padecimientos = pacienteDTO.ID_Padecimientos,
+                ID_Genero = pacienteDTO.ID_Genero,
+                ID_Estatus = pacienteDTO.ID_Estatus,
+                CURP = pacienteDTO.CURP,
                 Fecha_Registro = DateTime.Now
             };
-
-            // Buscar el estatus "Activo" para el paciente
-            var estatusActivo = await _context.EstatusPacientes
-                .FirstOrDefaultAsync(e => e.Nombre_Estatus == "Activo");
-            if (estatusActivo != null)
-            {
-                paciente.ID_Estatus = estatusActivo.ID_Estatus;
-            }
 
             _context.Pacientes.Add(paciente);
             await _context.SaveChangesAsync();
 
-            // Cargar los datos relacionados para devolver el DTO completo
-            var pacienteCreado = await GetPaciente(paciente.ID_Paciente);
-            return CreatedAtAction(nameof(GetPaciente), new { id = paciente.ID_Paciente }, pacienteCreado.Value);
+            return CreatedAtAction("GetPaciente", new { id = paciente.ID_Paciente }, await GetPaciente(paciente.ID_Paciente));
         }
 
         // PUT: api/Pacientes/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPaciente(int id, UpdatePacienteDTO updatePacienteDto)
+        public async Task<IActionResult> UpdatePaciente(int id, PacienteActualizarDTO pacienteDTO)
         {
             var paciente = await _context.Pacientes.FindAsync(id);
             if (paciente == null)
@@ -170,43 +157,60 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            // Actualizar solo los campos que no son null en el DTO
-            if (updatePacienteDto.Nombre != null)
-                paciente.Nombre = updatePacienteDto.Nombre;
-            if (updatePacienteDto.Apellido_Paterno != null)
-                paciente.Apellido_Paterno = updatePacienteDto.Apellido_Paterno;
-            if (updatePacienteDto.Apellido_Materno != null)
-                paciente.Apellido_Materno = updatePacienteDto.Apellido_Materno;
-            if (updatePacienteDto.Fecha_Nacimiento.HasValue)
-                paciente.Fecha_Nacimiento = updatePacienteDto.Fecha_Nacimiento;
-            if (updatePacienteDto.Calle != null)
-                paciente.Calle = updatePacienteDto.Calle;
-            if (updatePacienteDto.Codigo_Postal.HasValue)
-                paciente.Codigo_Postal = updatePacienteDto.Codigo_Postal;
-            if (updatePacienteDto.Num_Calle.HasValue)
-                paciente.Num_Calle = updatePacienteDto.Num_Calle;
-            if (updatePacienteDto.Correo_Electronico != null)
-                paciente.Correo_Electronico = updatePacienteDto.Correo_Electronico;
-            if (updatePacienteDto.Telefono != null)
-                paciente.Telefono = updatePacienteDto.Telefono;
-            if (updatePacienteDto.Altura.HasValue)
-                paciente.Altura = updatePacienteDto.Altura;
-            if (updatePacienteDto.Peso.HasValue)
-                paciente.Peso = updatePacienteDto.Peso;
-            if (updatePacienteDto.ID_Tipo.HasValue)
-                paciente.ID_Tipo = updatePacienteDto.ID_Tipo;
-            if (updatePacienteDto.ID_Alergias.HasValue)
-                paciente.ID_Alergias = updatePacienteDto.ID_Alergias;
-            if (updatePacienteDto.ID_Operaciones.HasValue)
-                paciente.ID_Operaciones = updatePacienteDto.ID_Operaciones;
-            if (updatePacienteDto.ID_Padecimientos.HasValue)
-                paciente.ID_Padecimientos = updatePacienteDto.ID_Padecimientos;
-            if (updatePacienteDto.ID_Genero.HasValue)
-                paciente.ID_Genero = updatePacienteDto.ID_Genero;
-            if (updatePacienteDto.CURP != null)
-                paciente.CURP = updatePacienteDto.CURP;
-            if (updatePacienteDto.ID_Estatus.HasValue)
-                paciente.ID_Estatus = updatePacienteDto.ID_Estatus;
+            // Actualizar solo los campos que no son nulos
+            if (pacienteDTO.Nombre != null)
+                paciente.Nombre = pacienteDTO.Nombre;
+            
+            if (pacienteDTO.Apellido_Paterno != null)
+                paciente.Apellido_Paterno = pacienteDTO.Apellido_Paterno;
+            
+            if (pacienteDTO.Apellido_Materno != null)
+                paciente.Apellido_Materno = pacienteDTO.Apellido_Materno;
+            
+            if (pacienteDTO.Fecha_Nacimiento.HasValue)
+                paciente.Fecha_Nacimiento = pacienteDTO.Fecha_Nacimiento;
+            
+            if (pacienteDTO.Calle != null)
+                paciente.Calle = pacienteDTO.Calle;
+            
+            if (pacienteDTO.Codigo_Postal.HasValue)
+                paciente.Codigo_Postal = pacienteDTO.Codigo_Postal;
+            
+            if (pacienteDTO.Num_Calle.HasValue)
+                paciente.Num_Calle = pacienteDTO.Num_Calle;
+            
+            if (pacienteDTO.Correo_Electronico != null)
+                paciente.Correo_Electronico = pacienteDTO.Correo_Electronico;
+            
+            if (pacienteDTO.Telefono != null)
+                paciente.Telefono = pacienteDTO.Telefono;
+            
+            if (pacienteDTO.Altura.HasValue)
+                paciente.Altura = pacienteDTO.Altura;
+            
+            if (pacienteDTO.Peso.HasValue)
+                paciente.Peso = pacienteDTO.Peso;
+            
+            if (pacienteDTO.ID_Tipo.HasValue)
+                paciente.ID_Tipo = pacienteDTO.ID_Tipo;
+            
+            if (pacienteDTO.ID_Alergias.HasValue)
+                paciente.ID_Alergias = pacienteDTO.ID_Alergias;
+            
+            if (pacienteDTO.ID_Operaciones.HasValue)
+                paciente.ID_Operaciones = pacienteDTO.ID_Operaciones;
+            
+            if (pacienteDTO.ID_Padecimientos.HasValue)
+                paciente.ID_Padecimientos = pacienteDTO.ID_Padecimientos;
+            
+            if (pacienteDTO.ID_Genero.HasValue)
+                paciente.ID_Genero = pacienteDTO.ID_Genero;
+            
+            if (pacienteDTO.ID_Estatus.HasValue)
+                paciente.ID_Estatus = pacienteDTO.ID_Estatus;
+            
+            if (pacienteDTO.CURP != null)
+                paciente.CURP = pacienteDTO.CURP;
 
             try
             {
@@ -237,14 +241,8 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            // En lugar de eliminar, actualizar el estatus a "Inactivo"
-            var estatusInactivo = await _context.EstatusPacientes
-                .FirstOrDefaultAsync(e => e.Nombre_Estatus == "Inactivo");
-            if (estatusInactivo != null)
-            {
-                paciente.ID_Estatus = estatusInactivo.ID_Estatus;
-                await _context.SaveChangesAsync();
-            }
+            _context.Pacientes.Remove(paciente);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -254,39 +252,68 @@ namespace backend.Controllers
             return _context.Pacientes.Any(e => e.ID_Paciente == id);
         }
 
-        // GET: api/Pacientes/tipos-sangre
-        [HttpGet("tipos-sangre")]
-        public async Task<ActionResult<IEnumerable<TipoSangre>>> GetTiposSangre()
+        // GET: api/Pacientes/Buscar?nombre=Juan
+        [HttpGet("Buscar")]
+        public async Task<ActionResult<IEnumerable<PacienteDTO>>> BuscarPacientes([FromQuery] string? nombre, [FromQuery] string? apellido, [FromQuery] string? curp)
         {
-            return await _context.TiposSangre.ToListAsync();
-        }
+            IQueryable<Paciente> query = _context.Pacientes
+                .Include(p => p.TipoSangre)
+                .Include(p => p.Alergia)
+                .Include(p => p.Operacion)
+                .Include(p => p.Padecimiento)
+                .Include(p => p.Genero)
+                .Include(p => p.Estatus);
 
-        // GET: api/Pacientes/alergias
-        [HttpGet("alergias")]
-        public async Task<ActionResult<IEnumerable<Alergia>>> GetAlergias()
-        {
-            return await _context.Alergias.ToListAsync();
-        }
+            if (!string.IsNullOrEmpty(nombre))
+            {
+                query = query.Where(p => p.Nombre != null && p.Nombre.Contains(nombre));
+            }
 
-        // GET: api/Pacientes/operaciones
-        [HttpGet("operaciones")]
-        public async Task<ActionResult<IEnumerable<Operacion>>> GetOperaciones()
-        {
-            return await _context.Operaciones.ToListAsync();
-        }
+            if (!string.IsNullOrEmpty(apellido))
+            {
+                query = query.Where(p => 
+                    (p.Apellido_Paterno != null && p.Apellido_Paterno.Contains(apellido)) || 
+                    (p.Apellido_Materno != null && p.Apellido_Materno.Contains(apellido)));
+            }
 
-        // GET: api/Pacientes/padecimientos
-        [HttpGet("padecimientos")]
-        public async Task<ActionResult<IEnumerable<Padecimiento>>> GetPadecimientos()
-        {
-            return await _context.Padecimientos.ToListAsync();
-        }
+            if (!string.IsNullOrEmpty(curp))
+            {
+                query = query.Where(p => p.CURP != null && p.CURP.Contains(curp));
+            }
 
-        // GET: api/Pacientes/generos
-        [HttpGet("generos")]
-        public async Task<ActionResult<IEnumerable<Genero>>> GetGeneros()
-        {
-            return await _context.Generos.ToListAsync();
+            var pacientes = await query
+                .Select(p => new PacienteDTO
+                {
+                    ID_Paciente = p.ID_Paciente,
+                    Nombre = p.Nombre,
+                    Apellido_Paterno = p.Apellido_Paterno,
+                    Apellido_Materno = p.Apellido_Materno,
+                    Fecha_Nacimiento = p.Fecha_Nacimiento,
+                    Calle = p.Calle,
+                    Codigo_Postal = p.Codigo_Postal,
+                    Num_Calle = p.Num_Calle,
+                    Correo_Electronico = p.Correo_Electronico,
+                    Telefono = p.Telefono,
+                    Altura = p.Altura,
+                    Peso = p.Peso,
+                    ID_Tipo = p.ID_Tipo,
+                    TipoSangreNombre = p.TipoSangre != null ? p.TipoSangre.Tipo_Sangre : null,
+                    ID_Alergias = p.ID_Alergias,
+                    AlergiaNombre = p.Alergia != null ? p.Alergia.Nombre_Alergia : null,
+                    ID_Operaciones = p.ID_Operaciones,
+                    OperacionNombre = p.Operacion != null ? p.Operacion.Nombre_Operacion : null,
+                    ID_Padecimientos = p.ID_Padecimientos,
+                    PadecimientoNombre = p.Padecimiento != null ? p.Padecimiento.Nombre_Padecimiento : null,
+                    ID_Genero = p.ID_Genero,
+                    GeneroNombre = p.Genero != null ? p.Genero.Genero_Nombre : null,
+                    Fecha_Registro = p.Fecha_Registro,
+                    ID_Estatus = p.ID_Estatus,
+                    EstatusNombre = p.Estatus != null ? p.Estatus.Nombre_Estatus : null,
+                    CURP = p.CURP
+                })
+                .ToListAsync();
+
+            return pacientes;
         }
     }
 }

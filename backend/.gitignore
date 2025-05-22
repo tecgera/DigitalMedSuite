@@ -1,47 +1,74 @@
-# Build results
+## Archivos de compilación
 bin/
 obj/
-
-# Visual Studio cache files
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-# Rider cache files
-.idea/
-
-# ASP.NET temporary files
-*.dll
-*.pdb
-*.cache
-*.json
-
-# Generated files
-*.GeneratedMSBuildEditorConfig.editorconfig
-*.FileListAbsolute.txt
-
-# Debug folders and files
-backend/obj/
-backend/bin/
-backend/*.pdb
-backend/*.dll
-backend/*.cache
-backend/*.json
-
-# Visual Studio Code settings folder
-.vscode/
-
-# NuGet Packages folder
-packages/
-
-# Resharper files
-_ReSharper*/
-
-# Others
+[Bb]uild/
+[Ll]og/
 *.log
+
+## Cache de ASP.NET
+*.dbmdl
+*.userosscache
+*.suo
+*.user
+*.userprefs
+
+## Configuraciones temporales
 *.vspscc
 *.vssscc
+*.tmp
+*.temp
 
-# Publish folder
+## VS Code
+.vscode/
+
+## Visual Studio
+.vs/
+*.csproj.user
+*.sln.docstates
+
+## Archivos generados por dotnet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+GeneratedFiles/
+
+## Archivos de test y cobertura
+TestResults/
+*.coverage
+*.coveragexml
+*.testsettings
+*.vsmdi
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+## Archivos de publicación
 publish/
+*.publish.xml
+
+## Archivos de usuario
+*.user
+*.rsuser
+*.suo
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+project.lock.json
+project.assets.json
+
+## Rider IDE
+.idea/
+
+## Otros posibles archivos basura
+*.DS_Store
+Thumbs.db
+
+## Sistema operativo
+ehthumbs.db
+Icon?
+Desktop.ini

@@ -1,18 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using backend.Data;
+using backend.DTOs;
+using backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using backend.Data;
-using backend.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Route("api/[controller]")]
     public class MedicosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -28,7 +23,7 @@ namespace backend.Controllers
         {
             var medicos = await _context.Medicos
                 .Include(m => m.Especialidad)
-                .Include(m => m.EstatusMedico)
+                .Include(m => m.Estatus)
                 .Select(m => new MedicoDTO
                 {
                     ID_Medico = m.ID_Medico,
@@ -38,11 +33,11 @@ namespace backend.Controllers
                     Correo = m.Correo,
                     Telefono = m.Telefono,
                     ID_Especialidad = m.ID_Especialidad,
-                    Especialidad = m.Especialidad != null ? m.Especialidad.Nombre_Especialidad : null,
+                    NombreEspecialidad = m.Especialidad != null ? m.Especialidad.Nombre_Especialidad : null,
                     Estado = m.Estado,
-                    Fecha_Creacion = m.Fecha_Creacion,
                     ID_Estatus = m.ID_Estatus,
-                    Estatus = m.EstatusMedico != null ? m.EstatusMedico.Nombre_Estatus : null
+                    NombreEstatus = m.Estatus != null ? m.Estatus.Nombre_Estatus : null,
+                    Fecha_Creacion = m.Fecha_Creacion
                 })
                 .ToListAsync();
 
@@ -55,68 +50,72 @@ namespace backend.Controllers
         {
             var medico = await _context.Medicos
                 .Include(m => m.Especialidad)
-                .Include(m => m.EstatusMedico)
-                .Where(m => m.ID_Medico == id)
-                .Select(m => new MedicoDTO
-                {
-                    ID_Medico = m.ID_Medico,
-                    Nombre = m.Nombre,
-                    Apellido_Paterno = m.Apellido_Paterno,
-                    Apellido_Materno = m.Apellido_Materno,
-                    Correo = m.Correo,
-                    Telefono = m.Telefono,
-                    ID_Especialidad = m.ID_Especialidad,
-                    Especialidad = m.Especialidad != null ? m.Especialidad.Nombre_Especialidad : null,
-                    Estado = m.Estado,
-                    Fecha_Creacion = m.Fecha_Creacion,
-                    ID_Estatus = m.ID_Estatus,
-                    Estatus = m.EstatusMedico != null ? m.EstatusMedico.Nombre_Estatus : null
-                })
-                .FirstOrDefaultAsync();
+                .Include(m => m.Estatus)
+                .FirstOrDefaultAsync(m => m.ID_Medico == id);
 
             if (medico == null)
             {
                 return NotFound();
             }
 
-            return medico;
+            var medicoDTO = new MedicoDTO
+            {
+                ID_Medico = medico.ID_Medico,
+                Nombre = medico.Nombre,
+                Apellido_Paterno = medico.Apellido_Paterno,
+                Apellido_Materno = medico.Apellido_Materno,
+                Correo = medico.Correo,
+                Telefono = medico.Telefono,
+                ID_Especialidad = medico.ID_Especialidad,
+                NombreEspecialidad = medico.Especialidad?.Nombre_Especialidad,
+                Estado = medico.Estado,
+                ID_Estatus = medico.ID_Estatus,
+                NombreEstatus = medico.Estatus?.Nombre_Estatus,
+                Fecha_Creacion = medico.Fecha_Creacion
+            };
+
+            return medicoDTO;
         }
 
         // POST: api/Medicos
         [HttpPost]
-        public async Task<ActionResult<MedicoDTO>> PostMedico(CreateMedicoDTO createMedicoDto)
+        public async Task<ActionResult<MedicoDTO>> CreateMedico(MedicoCrearDTO medicoDTO)
         {
             var medico = new Medico
             {
-                Nombre = createMedicoDto.Nombre,
-                Apellido_Paterno = createMedicoDto.Apellido_Paterno,
-                Apellido_Materno = createMedicoDto.Apellido_Materno,
-                Correo = createMedicoDto.Correo,
-                Telefono = createMedicoDto.Telefono,
-                ID_Especialidad = createMedicoDto.ID_Especialidad,
-                Estado = createMedicoDto.Estado,
+                ID_Medico = medicoDTO.ID_Medico,
+                Nombre = medicoDTO.Nombre,
+                Apellido_Paterno = medicoDTO.Apellido_Paterno,
+                Apellido_Materno = medicoDTO.Apellido_Materno,
+                Correo = medicoDTO.Correo,
+                Telefono = medicoDTO.Telefono,
+                ID_Especialidad = medicoDTO.ID_Especialidad,
+                Estado = medicoDTO.Estado,
+                ID_Estatus = medicoDTO.ID_Estatus,
                 Fecha_Creacion = DateTime.Now
             };
-
-            // Buscar el estatus "Activo" para el médico
-            var estatusActivo = await _context.EstatusMedicos
-                .FirstOrDefaultAsync(e => e.Nombre_Estatus == "Activo");
-            if (estatusActivo != null)
-            {
-                medico.ID_Estatus = estatusActivo.ID_Estatus;
-            }
 
             _context.Medicos.Add(medico);
             await _context.SaveChangesAsync();
 
-            // Cargar los datos relacionados para devolver el DTO completo
-            var medicoCreado = await GetMedico(medico.ID_Medico);
-            return CreatedAtAction(nameof(GetMedico), new { id = medico.ID_Medico }, medicoCreado.Value);
+            return CreatedAtAction("GetMedico", new { id = medico.ID_Medico }, new MedicoDTO
+            {
+                ID_Medico = medico.ID_Medico,
+                Nombre = medico.Nombre,
+                Apellido_Paterno = medico.Apellido_Paterno,
+                Apellido_Materno = medico.Apellido_Materno,
+                Correo = medico.Correo,
+                Telefono = medico.Telefono,
+                ID_Especialidad = medico.ID_Especialidad,
+                Estado = medico.Estado,
+                ID_Estatus = medico.ID_Estatus,
+                Fecha_Creacion = medico.Fecha_Creacion
+            });
         }
 
         // PUT: api/Medicos/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMedico(int id, UpdateMedicoDTO updateMedicoDto)
+        public async Task<IActionResult> UpdateMedico(int id, MedicoActualizarDTO medicoDTO)
         {
             var medico = await _context.Medicos.FindAsync(id);
             if (medico == null)
@@ -124,23 +123,30 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            // Actualizar solo los campos que no son null en el DTO
-            if (updateMedicoDto.Nombre != null)
-                medico.Nombre = updateMedicoDto.Nombre;
-            if (updateMedicoDto.Apellido_Paterno != null)
-                medico.Apellido_Paterno = updateMedicoDto.Apellido_Paterno;
-            if (updateMedicoDto.Apellido_Materno != null)
-                medico.Apellido_Materno = updateMedicoDto.Apellido_Materno;
-            if (updateMedicoDto.Correo != null)
-                medico.Correo = updateMedicoDto.Correo;
-            if (updateMedicoDto.Telefono != null)
-                medico.Telefono = updateMedicoDto.Telefono;
-            if (updateMedicoDto.ID_Especialidad.HasValue)
-                medico.ID_Especialidad = updateMedicoDto.ID_Especialidad;
-            if (updateMedicoDto.Estado != null)
-                medico.Estado = updateMedicoDto.Estado;
-            if (updateMedicoDto.ID_Estatus.HasValue)
-                medico.ID_Estatus = updateMedicoDto.ID_Estatus;
+            // Actualizar solo los campos que no son nulos
+            if (medicoDTO.Nombre != null)
+                medico.Nombre = medicoDTO.Nombre;
+            
+            if (medicoDTO.Apellido_Paterno != null)
+                medico.Apellido_Paterno = medicoDTO.Apellido_Paterno;
+            
+            if (medicoDTO.Apellido_Materno != null)
+                medico.Apellido_Materno = medicoDTO.Apellido_Materno;
+            
+            if (medicoDTO.Correo != null)
+                medico.Correo = medicoDTO.Correo;
+            
+            if (medicoDTO.Telefono != null)
+                medico.Telefono = medicoDTO.Telefono;
+            
+            if (medicoDTO.ID_Especialidad.HasValue)
+                medico.ID_Especialidad = medicoDTO.ID_Especialidad;
+            
+            if (medicoDTO.Estado != null)
+                medico.Estado = medicoDTO.Estado;
+            
+            if (medicoDTO.ID_Estatus.HasValue)
+                medico.ID_Estatus = medicoDTO.ID_Estatus;
 
             try
             {
@@ -171,14 +177,8 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            // En lugar de eliminar, actualizar el estatus a "Inactivo"
-            var estatusInactivo = await _context.EstatusMedicos
-                .FirstOrDefaultAsync(e => e.Nombre_Estatus == "Inactivo");
-            if (estatusInactivo != null)
-            {
-                medico.ID_Estatus = estatusInactivo.ID_Estatus;
-                await _context.SaveChangesAsync();
-            }
+            _context.Medicos.Remove(medico);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -188,21 +188,14 @@ namespace backend.Controllers
             return _context.Medicos.Any(e => e.ID_Medico == id);
         }
 
-        // GET: api/Medicos/especialidades
-        [HttpGet("especialidades")]
-        public async Task<ActionResult<IEnumerable<Especialidad>>> GetEspecialidades()
-        {
-            return await _context.Especialidades.ToListAsync();
-        }
-
-        // GET: api/Medicos/por-especialidad/{especialidadId}
-        [HttpGet("por-especialidad/{especialidadId}")]
-        public async Task<ActionResult<IEnumerable<MedicoDTO>>> GetMedicosPorEspecialidad(int especialidadId)
+        // GET: api/Medicos/Especialidad/1
+        [HttpGet("Especialidad/{id}")]
+        public async Task<ActionResult<IEnumerable<MedicoDTO>>> GetMedicosByEspecialidad(int id)
         {
             var medicos = await _context.Medicos
                 .Include(m => m.Especialidad)
-                .Include(m => m.EstatusMedico)
-                .Where(m => m.ID_Especialidad == especialidadId && m.ID_Estatus == 1) // Asumiendo que 1 es el ID de estatus "Activo"
+                .Include(m => m.Estatus)
+                .Where(m => m.ID_Especialidad == id)
                 .Select(m => new MedicoDTO
                 {
                     ID_Medico = m.ID_Medico,
@@ -212,11 +205,11 @@ namespace backend.Controllers
                     Correo = m.Correo,
                     Telefono = m.Telefono,
                     ID_Especialidad = m.ID_Especialidad,
-                    Especialidad = m.Especialidad != null ? m.Especialidad.Nombre_Especialidad : null,
+                    NombreEspecialidad = m.Especialidad != null ? m.Especialidad.Nombre_Especialidad : null,
                     Estado = m.Estado,
-                    Fecha_Creacion = m.Fecha_Creacion,
                     ID_Estatus = m.ID_Estatus,
-                    Estatus = m.EstatusMedico != null ? m.EstatusMedico.Nombre_Estatus : null
+                    NombreEstatus = m.Estatus != null ? m.Estatus.Nombre_Estatus : null,
+                    Fecha_Creacion = m.Fecha_Creacion
                 })
                 .ToListAsync();
 

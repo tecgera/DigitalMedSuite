@@ -67,22 +67,18 @@ document.addEventListener('DOMContentLoaded', function() {
 const apiBaseUrl = 'http://localhost:5027/api'; // Ajusta esto a tu URL de backend
 
 // Manejar el envío del formulario
-document.getElementById('submit').addEventListener('click', function() {
-    const emailInput = document.getElementById('email');
+document.getElementById('submit').addEventListener('click', function() {    const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
-    const email = emailInput.value.trim();
+    const username = usernameInput.value.trim();
     const password = passwordInput.value;
     let isValid = true;
     
-    clearError(emailInput);
+    clearError(usernameInput);
     clearError(passwordInput);
     
-    // Validar email
-    if (!email) {
-        showError(emailInput, 'Por favor, ingrese su correo electrónico');
-        isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showError(emailInput, 'Por favor, ingrese un correo electrónico válido');
+    // Validar nombre de usuario
+    if (!username) {
+        showError(usernameInput, 'Por favor, ingrese su nombre de usuario');
         isValid = false;
     }
     
@@ -97,12 +93,10 @@ document.getElementById('submit').addEventListener('click', function() {
         const submitButton = document.getElementById('submit');
         const originalText = submitButton.textContent;
         submitButton.disabled = true;
-        submitButton.innerHTML = '<div class="spinner"></div> Iniciando sesión...';
-        
-        // Preparar datos para enviar
+        submitButton.innerHTML = '<div class="spinner"></div> Iniciando sesión...';            // Preparar datos para enviar
         const loginData = {
-            email: email,
-            password: password
+            Nombre_Usuario: username,
+            Password: password
         };
         
         // Hacer la petición al API
@@ -121,22 +115,23 @@ document.getElementById('submit').addEventListener('click', function() {
             }
             return response.json();
         })
-        .then(data => {
-            // Guardar el token y datos del usuario
+        .then(data => {            // Guardar el token y datos del usuario
             const userData = {
-                username: data.username,
-                email: data.email,
-                rol: data.rol
+                username: data.Nombre_Usuario,
+                nombre: data.Nombre,
+                apellidoPaterno: data.Apellido_Paterno,
+                apellidoMaterno: data.Apellido_Materno,
+                email: data.Correo,
+                rol: data.Rol
             };
             
-            saveAuthToken(data.token, userData);
+            saveAuthToken(data.Token, userData);
             
             // Redireccionar al dashboard
             window.location.href = 'Principal.html';
         })
         .catch(error => {
-            console.error('Error de inicio de sesión:', error);
-            showError(emailInput, error.message || 'Error al iniciar sesión');
+            console.error('Error de inicio de sesión:', error);            showError(usernameInput, error.message || 'Error al iniciar sesión');
             showError(passwordInput, error.message || 'Error al iniciar sesión');
         })
         .finally(() => {
