@@ -903,8 +903,12 @@
         console.log('Mostrando citas de hoy en dashboard:', citasPorFiltro.hoy);
         mostrarListadoCitas('citasListaHoy', citasPorFiltro.hoy);
       }
-    } catch (error) {
-      console.error('Error en inicialización del módulo de citas:', error);
+    } catch (error) {      console.error('Error en inicialización del módulo de citas:', error);
     }
   });
+
+  // Exponer funciones al contexto global para permitir su uso desde otros scripts
+  window.cargarCitasDesdeAPI = cargarCitasDesdeAPI;
+  window.cargarCitas = cargarCitas;
+  
 })(); // Cierre correcto del IIFE

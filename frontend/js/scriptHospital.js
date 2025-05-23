@@ -211,9 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const response = await window.apiService.consultorios.create({
           Nombre_Consultorio: nombreConsultorio,
           ID_Estatus: 1  // 1 = Disponible por defecto
-        });
-
-        if (response) {
+        });        if (response) {
           mostrarNotificacion('Consultorio registrado correctamente', 'success');
           formConsultorio.reset();
           
@@ -226,9 +224,23 @@ document.addEventListener('DOMContentLoaded', function() {
               link.classList.remove('active');
             }
           });
-
-          // Recargar la lista de consultorios
-          await cargarConsultorios();
+          
+          // Activar la pestaña de consultorios y cargar los datos actualizados
+          const consultoriosTabBtn = document.querySelector('[data-tab="consultoriosTab"]');
+          if (consultoriosTabBtn) {
+            // Activar pestaña de consultorios
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            consultoriosTabBtn.classList.add('active');
+            
+            // Mostrar contenido de consultorios
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('consultoriosTab').classList.add('active');
+            
+            // Recargar la lista de consultorios
+            if (typeof window.cargarConsultoriosDirecto === 'function') {
+              setTimeout(() => window.cargarConsultoriosDirecto(), 100);
+            }
+          }
         }
       } catch (error) {
         console.error('Error al registrar consultorio:', error);

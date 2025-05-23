@@ -250,13 +250,45 @@ function configurarFormularioCita() {
       const respuesta = await window.apiService.citas.create(citaData);
       
       console.log("Respuesta del servidor:", respuesta);
-      
-      // Mostrar mensaje de éxito
+        // Mostrar mensaje de éxito
       alert('Cita registrada con éxito');
       
-      // Limpiar formulario y regresar a la página de citas
+      // Limpiar formulario
       formCita.reset();
+      
+      // Regresar a la página de citas y asegurar que la vista se actualice
       window.showPage('citas');
+      
+      // Recargar los datos de citas para que la nueva cita aparezca
+      if (window.cargarCitasDesdeAPI) {
+        // Si la función está disponible directamente, usarla
+        await window.cargarCitasDesdeAPI();
+        if (window.cargarCitas) window.cargarCitas('todos');
+      } else {
+        // Esperar un poco y luego intentar obtener la función desde cualquier instancia IIFE
+        setTimeout(async () => {
+          try {
+            // Buscar la función en el contexto global
+            const cargarCitasFn = window.cargarCitasDesdeAPI;
+            if (cargarCitasFn && typeof cargarCitasFn === 'function') {
+              await cargarCitasFn();
+              // También intentar recargar la vista
+              if (window.cargarCitas && typeof window.cargarCitas === 'function') {
+                window.cargarCitas('todos');
+              }
+            } else {
+              // Si no podemos encontrar la función, intentar forzar la actualización de la vista
+              console.log("Recargando datos manualmente después de agregar cita");
+              const citasElements = document.querySelectorAll('.tab-btn[data-tab="citasTab"]');
+              if (citasElements.length > 0) {
+                citasElements[0].click();
+              }
+            }
+          } catch (e) {
+            console.error("Error al actualizar la vista después de crear la cita:", e);
+          }
+        }, 100);
+      }
       
     } catch (error) {
       console.error('Error al registrar la cita:', error);
