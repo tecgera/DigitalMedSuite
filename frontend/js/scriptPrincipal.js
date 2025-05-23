@@ -301,6 +301,23 @@ async function actualizarEstadisticasCitas() {
   }
 }
 
+// Actualizar contador de pacientes
+async function actualizarContadorPacientes() {
+  try {
+    // Obtener todos los pacientes
+    const pacientes = await window.apiService.pacientes.getAll();
+    if (!Array.isArray(pacientes)) return;
+
+    // Actualizar el número en el dashboard
+    const numPacientesElement = document.querySelector('.stat-card:first-child .stat-details h3');
+    if (numPacientesElement) {
+      numPacientesElement.textContent = pacientes.length;
+    }
+  } catch (error) {
+    console.error('Error al actualizar contador de pacientes:', error);
+  }
+}
+
 // Inicialización del dashboard
 document.addEventListener('DOMContentLoaded', function () {
   console.log('DOM cargado - Verificando autenticación...');
@@ -312,12 +329,12 @@ document.addEventListener('DOMContentLoaded', function () {
     window.location.replace('index.html');
     return;
   }
-  
-  console.log('Autenticación verificada. Actualizando interfaz...');
+    console.log('Autenticación verificada. Actualizando interfaz...');
   updateUserInterface();
   
   // Actualizar estadísticas iniciales
   actualizarEstadisticasCitas();
+  actualizarContadorPacientes();
 
   const calendarEl = document.getElementById('calendar');
   if (calendarEl) {
@@ -369,4 +386,5 @@ document.addEventListener('DOMContentLoaded', function () {
   setupHospitalTabs();
   cargarCitasHoy();
   actualizarEstadisticasCitas();
+  actualizarContadorPacientes();
 });
