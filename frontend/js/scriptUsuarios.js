@@ -216,10 +216,12 @@ function seleccionarUsuario(elemento, datos) {
   
   const botonModificar = document.getElementById("btnModificarUsuario");
   if (botonModificar) botonModificar.disabled = false;
-  
-  // Salir del modo edición si estaba activo
+    // Salir del modo edición si estaba activo
   if (modoEdicion) {
+    modoEdicion = false;
     toggleModoEdicion(false);
+    // Asegurarse de que los cambios sean consistentes
+    console.log("Reseteo de modo edición al seleccionar usuario:", modoEdicion ? "edición" : "visualización");
   }
 }
 
@@ -229,6 +231,11 @@ function seleccionarUsuario(elemento, datos) {
 function mostrarUsuarioSeleccionado(usuario) {
   const panel = document.getElementById("resultadoUsuario");
   if (!panel) return;
+
+  // Asegurar que modoEdicion sea booleano
+  modoEdicion = Boolean(modoEdicion);
+  
+  console.log("Mostrando usuario en modo:", modoEdicion ? "edición" : "visualización");
 
   // Obtener nombre completo formateado
   const nombreCompleto = [
@@ -376,16 +383,24 @@ function mostrarUsuarioSeleccionado(usuario) {
 // ========================
 document.addEventListener("DOMContentLoaded", function () {
   cargarUsuarios();
-  
-  // Configurar el evento del botón modificar
+    // Configurar el evento del botón modificar
   const btnModificar = document.getElementById('btnModificarUsuario');
   if (btnModificar) {
     btnModificar.addEventListener('click', () => {
       if (usuarioSeleccionado) {
+        // Actualizar el valor directamente antes de llamar a la función
+        modoEdicion = true;
         toggleModoEdicion(true);
         mostrarUsuarioSeleccionado(usuarioSeleccionado);
+        console.log("Estado de modoEdicion después de clic en Modificar:", modoEdicion);
       }
     });
+  }
+  
+  // Configurar el evento del botón guardar cambios (el que está en la interfaz principal)
+  const btnGuardar = document.getElementById('btnGuardarCambiosUsuario');
+  if (btnGuardar) {
+    btnGuardar.addEventListener('click', guardarCambiosUsuario);
   }
   
   // Configurar búsqueda de usuarios
@@ -399,18 +414,26 @@ document.addEventListener("DOMContentLoaded", function () {
 // Modo Edición
 // ========================
 function toggleModoEdicion(activar) {
-  modoEdicion = activar;
+  // Establecer el modo de edición explícitamente
+  modoEdicion = Boolean(activar);
+  
+  // Registrar cambio de estado
+  console.log(`Cambiando modo edición a: ${modoEdicion ? 'edición' : 'visualización'}`);
   
   // Manejar botón modificar
   const btnModificar = document.getElementById('btnModificarUsuario');
+  const btnGuardar = document.getElementById('btnGuardarCambiosUsuario');
+  
   if (btnModificar) {
-    btnModificar.disabled = activar;
+    btnModificar.disabled = modoEdicion;
+    btnModificar.style.display = modoEdicion ? 'none' : 'inline-flex';
   }
   
-  // Actualizar campos editables
-  if (activar && usuarioSeleccionado) {
-    mostrarUsuarioSeleccionado(usuarioSeleccionado);
+  if (btnGuardar) {
+    btnGuardar.style.display = modoEdicion ? 'inline-flex' : 'none';
   }
+  
+  // No llamamos a mostrarUsuarioSeleccionado aquí para evitar recursión
 }
 
 // ========================
@@ -430,15 +453,36 @@ async function guardarCambiosUsuario() {
     mostrarNotificacion('Error: No se pudo identificar el usuario a actualizar', 'error');
     return;
   }
-  try {
+    // Si no estamos en modo edición, activarlo y retornar
+  if (!modoEdicion) {
+    console.log('Activando modo edición antes de guardar');
+    modoEdicion = true;
+    toggleModoEdicion(true);
+    mostrarUsuarioSeleccionado(usuarioSeleccionado);
+    return;
+  }try {
+    // Verificar que los elementos existen antes de intentar leer sus valores
+    const nombreUsuarioInput = document.getElementById('edit-nombre-usuario');
+    const nombreInput = document.getElementById('edit-nombre');
+    const apellidoPaternoInput = document.getElementById('edit-apellido-paterno');
+    const apellidoMaternoInput = document.getElementById('edit-apellido-materno');
+    const correoInput = document.getElementById('edit-correo');
+    const telefonoInput = document.getElementById('edit-telefono');
+    
+    if (!nombreUsuarioInput || !nombreInput || !apellidoPaternoInput || !apellidoMaternoInput || !correoInput || !telefonoInput) {
+      console.error('No se encontraron los campos de edición');
+      mostrarNotificacion('Error: No se pudieron encontrar los campos de edición', 'error');
+      return;
+    }
+    
     const datosActualizados = {
       ID_Usuario: usuarioSeleccionado.id_Usuario,
-      Nombre_Usuario: document.getElementById('edit-nombre-usuario').value,
-      Nombre: document.getElementById('edit-nombre').value,
-      Apellido_Paterno: document.getElementById('edit-apellido-paterno').value,
-      Apellido_Materno: document.getElementById('edit-apellido-materno').value,
-      Correo: document.getElementById('edit-correo').value,
-      Telefono: document.getElementById('edit-telefono').value,
+      Nombre_Usuario: nombreUsuarioInput.value,
+      Nombre: nombreInput.value,
+      Apellido_Paterno: apellidoPaternoInput.value,
+      Apellido_Materno: apellidoMaternoInput.value,
+      Correo: correoInput.value,
+      Telefono: telefonoInput.value,
       ID_Estatus: usuarioSeleccionado.id_Estatus // Mantener el estatus actual
     };
     
