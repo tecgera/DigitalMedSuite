@@ -13,7 +13,7 @@ Habra la terminal y coloquese en la carpeta backend
 Ejemplo:
 cd backend
 
-y despues corrra el backend
+y despues corrra el backend (La Base de Datos se migra automaticamente)
 
 dotnet run 
 
