@@ -204,9 +204,8 @@
                   <iconify-icon icon="mdi:calendar-blank" width="48"></iconify-icon>
                   <p>No hay citas programadas para hoy</p>
                 </div>
-              </div>
-              <div class="card-footer">
-                <button class="btn primary-btn">
+              </div>              <div class="card-footer">
+                <button class="btn primary-btn" onclick="showPage('registroCita')">
                   <iconify-icon icon="mdi:calendar-plus"></iconify-icon>
                   Nueva Cita
                 </button>
@@ -235,20 +234,19 @@
                 </h2>
               </div>
               <div class="card-content">
-                <div class="action-buttons">
-                  <button class="action-btn">
+                <div class="action-buttons">                  <button class="action-btn" onclick="showPage('registroCita')">
                     <iconify-icon icon="mdi:calendar-plus" width="24"></iconify-icon>
                     <span>Nueva Cita</span>
                   </button>
-                  <button class="action-btn">
+                  <button class="action-btn" onclick="showPage('registroPacientes')">
                     <iconify-icon icon="mdi:account-plus" width="24"></iconify-icon>
                     <span>Registrar Paciente</span>
                   </button>
-                  <button class="action-btn">
+                  <button class="action-btn" onclick="showPage('pacientes')">
                     <iconify-icon icon="mdi:folder-open" width="24"></iconify-icon>
                     <span>Ver Expedientes</span>
                   </button>
-                  <button class="action-btn">
+                  <button class="action-btn" onclick="showPage('pacientes')">
                     <iconify-icon icon="mdi:file-document-edit" width="24"></iconify-icon>
                     <span>Actualizar Expediente</span>
                   </button>
