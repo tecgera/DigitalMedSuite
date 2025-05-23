@@ -61,13 +61,16 @@ async function guardarPaciente() {
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<iconify-icon icon="mdi:loading" class="spin"></iconify-icon> Guardando...';
     }
-      // Recopilar datos del formulario
+    
+    // Recopilar datos del formulario
     const formData = new FormData(document.querySelector('#formPaciente'));
+    
+    // Datos básicos del paciente
     const pacienteData = {
       Nombre: formData.get('nombre'),
       Apellido_Paterno: formData.get('apellido_paterno'),
       Apellido_Materno: formData.get('apellido_materno'),
-      CURP: formData.get('curp') ? (formData.get('curp').length > 15 ? formData.get('curp').substring(0, 15) : formData.get('curp')) : null,
+      CURP: formData.get('curp') ? (formData.get('curp').length > 18 ? formData.get('curp').substring(0, 18) : formData.get('curp')) : null,
       Fecha_Nacimiento: formData.get('fecha_nacimiento'),
       Calle: formData.get('calle'),
       Num_Calle: formData.get('num_calle') ? parseInt(formData.get('num_calle')) : null,
@@ -79,19 +82,196 @@ async function guardarPaciente() {
       ID_Tipo: formData.get('tipo_sangre') ? parseInt(formData.get('tipo_sangre')) : null,
       ID_Genero: formData.get('genero') ? parseInt(formData.get('genero')) : null,
       ID_Estatus: 1, // Activo por defecto
+      ID_Alergias: null,
+      ID_Operaciones: null,
+      ID_Padecimientos: null
     };
     
-    // Procesar alergias, operaciones y padecimientos
-    // Aquí debemos procesar los valores dinámicos (podría requerir lógica adicional según el backend)
+    // Obtener los valores seleccionados y personalizados
     const alergias = formData.getAll('alergia[]');
     const operaciones = formData.getAll('operacion[]');
     const padecimientos = formData.getAll('padecimiento[]');
     
-    // Simplificación: solo tomamos el primer valor no-ninguna
-    pacienteData.ID_Alergias = obtenerIdCatalogo(alergias.find(a => a !== 'ninguna') || 'ninguna', 'alergias');
-    pacienteData.ID_Operaciones = obtenerIdCatalogo(operaciones.find(o => o !== 'ninguna') || 'ninguna', 'operaciones');
-    pacienteData.ID_Padecimientos = obtenerIdCatalogo(padecimientos.find(p => p !== 'ninguna') || 'ninguna', 'padecimientos');
+    const otrasAlergias = formData.getAll('otraAlergia[]');
+    const otrasOperaciones = formData.getAll('otraOperacion[]');
+    const otrosPadecimientos = formData.getAll('otraPadecimiento[]');
     
+    console.log('Valores del formulario:', {
+      alergias,
+      operaciones,
+      padecimientos,
+      otrasAlergias,
+      otrasOperaciones,
+      otrosPadecimientos
+    });
+    
+    // Procesar las alergias
+    let alergiaSeleccionada = alergias.find(a => a !== 'ninguna');
+    
+    if (alergiaSeleccionada === 'otro' && otrasAlergias.length > 0) {
+      const otraAlergia = otrasAlergias[0].trim();      if (otraAlergia) {
+        try {
+          console.log('Creando nueva alergia:', otraAlergia);
+          // Intentar guardar la nueva alergia
+          const nuevaAlergia = await window.apiService.catalogos.createAlergia(otraAlergia);
+          console.log('Nueva alergia creada:', nuevaAlergia);
+          if (nuevaAlergia && nuevaAlergia.ID_Alergias) {
+            pacienteData.ID_Alergias = nuevaAlergia.ID_Alergias;
+            // Recargar las opciones del combo box
+            await loadDynamicOptions('alergiasContainer', 'alergiaSelect', 'Alergia');
+            // Seleccionar la nueva alergia
+            const selectors = document.querySelectorAll('.alergiaSelect');
+            selectors.forEach(selector => {
+              if (selector.value === 'otro') {
+                selector.value = nuevaAlergia.Nombre_Alergia.toLowerCase();
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error al guardar alergia personalizada:', error);
+          // Plan B: En caso de error, intentar obtener todas las alergias y buscar una que tenga un nombre similar
+          try {
+            const alergiasCatalogo = await window.apiService.catalogos.getAlergias();
+            // Si hay alergias, asignar la primera como valor por defecto
+            if (alergiasCatalogo && alergiasCatalogo.length > 0) {
+              console.log('Usando la primera alergia del catálogo como fallback:', alergiasCatalogo[0]);
+              pacienteData.ID_Alergias = alergiasCatalogo[0].ID_Alergias;
+              mostrarNotificacion('No se pudo crear la alergia personalizada. Se utilizó un valor por defecto.', 'warning');
+            }
+          } catch (catalogError) {
+            console.error('Error al obtener catálogo de alergias:', catalogError);
+          }
+        }
+      }
+    } else if (alergiaSeleccionada && alergiaSeleccionada !== 'ninguna') {
+      try {
+        // Obtener el catálogo de alergias
+        const alergiasCatalogo = await window.apiService.catalogos.getAlergias();
+          // Buscar la alergia seleccionada en el catálogo
+        const alergiaEncontrada = alergiasCatalogo.find(a => a && a.Nombre_Alergia && 
+                                                a.Nombre_Alergia.toLowerCase() === alergiaSeleccionada.toLowerCase());
+        
+        if (alergiaEncontrada) {
+          pacienteData.ID_Alergias = alergiaEncontrada.ID_Alergias;
+        }
+      } catch (error) {
+        console.error('Error al obtener catálogo de alergias:', error);
+      }
+    }
+    
+    // Procesar las operaciones
+    let operacionSeleccionada = operaciones.find(o => o !== 'ninguna');
+    
+    if (operacionSeleccionada === 'otro' && otrasOperaciones.length > 0) {
+      const otraOperacion = otrasOperaciones[0].trim();      if (otraOperacion) {
+        try {
+          console.log('Creando nueva operación:', otraOperacion);
+          // Intentar guardar la nueva operación
+          const nuevaOperacion = await window.apiService.catalogos.createOperacion(otraOperacion);
+          console.log('Nueva operación creada:', nuevaOperacion);
+          if (nuevaOperacion && nuevaOperacion.ID_Operaciones) {
+            pacienteData.ID_Operaciones = nuevaOperacion.ID_Operaciones;
+            // Recargar las opciones del combo box
+            await loadDynamicOptions('operacionesContainer', 'operacionSelect', 'Operacion');
+            // Seleccionar la nueva operación
+            const selectors = document.querySelectorAll('.operacionSelect');
+            selectors.forEach(selector => {
+              if (selector.value === 'otro') {
+                selector.value = nuevaOperacion.Nombre_Operacion.toLowerCase();
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error al guardar operación personalizada:', error);
+          // Plan B: En caso de error, intentar obtener todas las operaciones y asignar una por defecto
+          try {
+            const operacionesCatalogo = await window.apiService.catalogos.getOperaciones();
+            // Si hay operaciones, asignar la primera como valor por defecto
+            if (operacionesCatalogo && operacionesCatalogo.length > 0) {
+              console.log('Usando la primera operación del catálogo como fallback:', operacionesCatalogo[0]);
+              pacienteData.ID_Operaciones = operacionesCatalogo[0].ID_Operaciones;
+              mostrarNotificacion('No se pudo crear la operación personalizada. Se utilizó un valor por defecto.', 'warning');
+            }
+          } catch (catalogError) {
+            console.error('Error al obtener catálogo de operaciones:', catalogError);
+          }
+        }
+      }
+    } else if (operacionSeleccionada && operacionSeleccionada !== 'ninguna') {
+      try {
+        // Obtener el catálogo de operaciones
+        const operacionesCatalogo = await window.apiService.catalogos.getOperaciones();
+        
+        // Buscar la operación seleccionada en el catálogo
+        const operacionEncontrada = operacionesCatalogo.find(o => o && o.Nombre_Operacion && 
+                                                      o.Nombre_Operacion.toLowerCase() === operacionSeleccionada.toLowerCase());
+        
+        if (operacionEncontrada) {
+          pacienteData.ID_Operaciones = operacionEncontrada.ID_Operaciones;
+        }
+      } catch (error) {
+        console.error('Error al obtener catálogo de operaciones:', error);
+      }
+    }
+    
+    // Procesar los padecimientos
+    let padecimientoSeleccionado = padecimientos.find(p => p !== 'ninguna');
+    
+    if (padecimientoSeleccionado === 'otro' && otrosPadecimientos.length > 0) {
+      const otroPadecimiento = otrosPadecimientos[0].trim();      if (otroPadecimiento) {
+        try {
+          console.log('Creando nuevo padecimiento:', otroPadecimiento);
+          // Intentar guardar el nuevo padecimiento
+          const nuevoPadecimiento = await window.apiService.catalogos.createPadecimiento(otroPadecimiento);
+          console.log('Nuevo padecimiento creado:', nuevoPadecimiento);
+          if (nuevoPadecimiento && nuevoPadecimiento.ID_Padecimientos) {
+            pacienteData.ID_Padecimientos = nuevoPadecimiento.ID_Padecimientos;
+            // Recargar las opciones del combo box
+            await loadDynamicOptions('padecimientosContainer', 'padecimientoSelect', 'Padecimiento');
+            // Seleccionar el nuevo padecimiento
+            const selectors = document.querySelectorAll('.padecimientoSelect');
+            selectors.forEach(selector => {
+              if (selector.value === 'otro') {
+                selector.value = nuevoPadecimiento.Nombre_Padecimiento.toLowerCase();
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error al guardar padecimiento personalizado:', error);
+          // Plan B: En caso de error, intentar obtener todos los padecimientos y asignar uno por defecto
+          try {
+            const padecimientosCatalogo = await window.apiService.catalogos.getPadecimientos();
+            // Si hay padecimientos, asignar el primero como valor por defecto
+            if (padecimientosCatalogo && padecimientosCatalogo.length > 0) {
+              console.log('Usando el primer padecimiento del catálogo como fallback:', padecimientosCatalogo[0]);
+              pacienteData.ID_Padecimientos = padecimientosCatalogo[0].ID_Padecimientos;
+              mostrarNotificacion('No se pudo crear el padecimiento personalizado. Se utilizó un valor por defecto.', 'warning');
+            }
+          } catch (catalogError) {
+            console.error('Error al obtener catálogo de padecimientos:', catalogError);
+          }
+        }
+      }
+    } else if (padecimientoSeleccionado && padecimientoSeleccionado !== 'ninguna') {
+      try {
+        // Obtener el catálogo de padecimientos
+        const padecimientosCatalogo = await window.apiService.catalogos.getPadecimientos();
+        
+        // Buscar el padecimiento seleccionado en el catálogo
+        const padecimientoEncontrado = padecimientosCatalogo.find(p => p && p.Nombre_Padecimiento && 
+                                                        p.Nombre_Padecimiento.toLowerCase() === padecimientoSeleccionado.toLowerCase());
+        
+        if (padecimientoEncontrado) {
+          pacienteData.ID_Padecimientos = padecimientoEncontrado.ID_Padecimientos;
+        }
+      } catch (error) {
+        console.error('Error al obtener catálogo de padecimientos:', error);
+      }
+    }
+    
+    console.log('Datos finales del paciente:', pacienteData);
+    
+    // Ahora crear o actualizar el paciente
     let response;
     
     if (modoEdicionPaciente && pacienteEditando) {
@@ -198,128 +378,301 @@ function setFormValue(form, fieldName, value) {
 }
 
 // Configura un selector dinámico con un valor específico
-function configurarSeleccion(className, id, nombreSeleccion) {
-  if (!id || !nombreSeleccion) return;
-  
+async function configurarSeleccion(className, id, nombreSeleccion) {
   const selector = document.querySelector(`.${className}`);
-  if (!selector) return;
+  if (!selector) {
+    console.warn(`No se encontró el selector con clase ${className}`);
+    return;
+  }
   
-  // Intentar seleccionar por el nombre de la selección
-  for (let option of selector.options) {
-    if (option.value.toLowerCase() === nombreSeleccion.toLowerCase()) {
-      option.selected = true;
+  // Si no hay ID o el valor es nulo/undefined, seleccionar "ninguna" por defecto
+  if (!id) {
+    console.log(`No hay ID para ${className}, seleccionando 'ninguna'`);
+    for (let option of selector.options) {
+      if (option.value === 'ninguna') {
+        option.selected = true;
+        return;
+      }
+    }
+    return;
+  }
+  
+  // Si no se proporciona un nombre de selección, intentamos obtenerlo dinámicamente
+  if (!nombreSeleccion) {
+    // Extraer el tipo de catálogo del nombre de la clase
+    let tipoCatalogo = '';
+    if (className.includes('alergia')) tipoCatalogo = 'alergias';
+    else if (className.includes('operacion')) tipoCatalogo = 'operaciones';
+    else if (className.includes('padecimiento')) tipoCatalogo = 'padecimientos';
+    else {
+      console.warn(`No se pudo determinar el tipo de catálogo para ${className}`);
       return;
+    }
+    
+    try {
+      console.log(`Obteniendo nombre para ID ${id} en ${tipoCatalogo}`);
+      // Obtener el nombre desde el catálogo
+      nombreSeleccion = await obtenerNombreCatalogo(id, tipoCatalogo);
+      
+      // Si no se pudo encontrar, usar 'ninguna' por defecto
+      if (!nombreSeleccion) {
+        console.log(`No se pudo encontrar un nombre para el ID ${id} en ${tipoCatalogo}, usando 'ninguna'`);
+        nombreSeleccion = 'ninguna';
+      }
+    } catch (error) {
+      console.error(`Error al obtener nombre para selección: ${error}`);
+      nombreSeleccion = 'ninguna';
     }
   }
   
-  // Si no se encuentra, seleccionar "otro"
+  console.log(`Configurando selección para ${className}: ID=${id}, Nombre=${nombreSeleccion}`);
+  
+  // Inicialmente seleccionar 'ninguna' como valor seguro
   for (let option of selector.options) {
-    if (option.value === 'otro') {
+    if (option.value === 'ninguna') {
       option.selected = true;
-      
-      // Crear input para el valor personalizado
-      const wrapper = selector.closest('.alergia-select-wrapper');
-      if (wrapper) {
-        const container = wrapper.querySelector('.select-container');
-        if (container) container.style.flex = "0 0 250px";
-        
-        const nombreCapitalizado = className.replace('Select', '');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = `otra${nombreCapitalizado}[]`;
-        input.value = nombreSeleccion;
-        input.placeholder = `Especifique otra ${nombreCapitalizado.toLowerCase()}`;
-        input.className = `otroAlergiaInput otro${nombreCapitalizado}Input`;
-        wrapper.appendChild(input);
+      break;
+    }
+  }
+    // Buscar la opción por el valor o por el data-id
+  let optionFound = false;
+  
+  // Primero intentar encontrar por valor (nombre)
+  if (nombreSeleccion && nombreSeleccion !== 'ninguna' && typeof nombreSeleccion === 'string') {
+    for (let option of selector.options) {
+      // Comprobar si el valor de la opción coincide con el nombre de la selección
+      if (option.value.toLowerCase() === nombreSeleccion.toLowerCase()) {
+        option.selected = true;
+        optionFound = true;
+        console.log(`Opción encontrada por nombre: ${nombreSeleccion}`);
+        break;
       }
-      return;
+      // También comprobar por el data-id si existe
+      if (option.hasAttribute('data-id') && parseInt(option.getAttribute('data-id')) === id) {
+        option.selected = true;
+        optionFound = true;
+        console.log(`Opción encontrada por ID: ${id}`);
+        break;
+      }
+    }
+  } else {
+    // Si nombreSeleccion no es un string, intentar encontrar por ID
+    for (let option of selector.options) {
+      if (option.hasAttribute('data-id') && parseInt(option.getAttribute('data-id')) === id) {
+        option.selected = true;
+        optionFound = true;
+        console.log(`Opción encontrada por ID: ${id}`);
+        break;
+      }
+    }
+  }
+  
+  // Si no se encuentra en las opciones existentes, mostrar en "otro"
+  if (!optionFound && nombreSeleccion && nombreSeleccion !== 'ninguna') {
+    console.log(`Valor no encontrado en las opciones, configurando como "otro": ${nombreSeleccion}`);
+    
+    // Seleccionar la opción "otro"
+    for (let option of selector.options) {
+      if (option.value === 'otro') {
+        option.selected = true;
+        
+        // Crear input para el valor personalizado
+        const wrapper = selector.closest('.alergia-select-wrapper');
+        if (wrapper) {
+          const selectContainer = wrapper.querySelector('.select-container');
+          if (selectContainer) selectContainer.style.flex = "0 0 250px";
+          
+          const nombreCapitalizado = className.replace('Select', '');
+          
+          // Comprobar si ya existe un input para evitar duplicados
+          if (!wrapper.querySelector(`.otro${nombreCapitalizado}Input`)) {
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = `otra${nombreCapitalizado}[]`;
+            input.value = nombreSeleccion;
+            input.placeholder = `Especifique otra ${nombreCapitalizado.toLowerCase()}`;
+            input.className = `otroAlergiaInput otro${nombreCapitalizado}Input`;
+            
+            // Agregar validación
+            input.setAttribute('maxlength', '50');
+            input.setAttribute('pattern', '[A-Za-zÀ-ÖØ-öø-ÿ ]+');
+            input.setAttribute('title', 'Solo se permiten letras y espacios');
+            input.required = true;
+            
+            inputGroup.appendChild(input);
+            wrapper.appendChild(inputGroup);
+          } else {
+            // Si ya existe, actualizar su valor
+            const input = wrapper.querySelector(`.otro${nombreCapitalizado}Input`);
+            if (input) input.value = nombreSeleccion;
+          }
+        }
+        break;
+      }
     }
   }
 }
 
 // Funciones auxiliares para mapear IDs a valores del catálogo y viceversa
-function obtenerIdCatalogo(valor, tipoCatalogo) {
-  if (!valor || valor === 'ninguna') return null;
-  
-  // Esta es una implementación simplificada.
-  // En una aplicación real, probablemente querrías:
-  // 1. Cargar estos catálogos desde la API al iniciar
-  // 2. Almacenarlos en variables globales
-  // 3. Usarlos para hacer mapeos exactos
-  
-  // Alergias
-  if (tipoCatalogo === 'alergias') {
-    switch (valor.toLowerCase()) {
-      case 'penicilina': return 1;
-      case 'polen': return 2;
-      case 'mariscos': return 3;
-      case 'otro': return 99;
-      default: return 99; // Valor para "otro"
-    }
+async function obtenerIdCatalogo(valor, tipoCatalogo) {
+  if (!valor || valor === 'ninguna') {
+    console.log(`Valor ninguna o vacío para ${tipoCatalogo}, retornando null`);
+    return null;
   }
   
-  // Operaciones
-  if (tipoCatalogo === 'operaciones') {
-    switch (valor.toLowerCase()) {
-      case 'cesarea': return 1;
-      case 'apendicectomia': return 2;
-      case 'bypass': return 3;
-      case 'otro': return 99;
-      default: return 99; // Valor para "otro"
+  try {
+    let catalogo = [];
+    
+    // Obtener el catálogo correspondiente
+    switch (tipoCatalogo) {
+      case 'alergias':
+        catalogo = await window.apiService.catalogos.getAlergias();
+        
+        // Si seleccionó "otro", no buscamos en el catálogo
+        if (valor === 'otro') {
+          console.log('Se seleccionó "otro" para alergias, se procesará el valor personalizado');
+          return null;
+        }
+        
+        // Buscar por nombre
+        const alergia = catalogo.find(a => a && a.Nombre_Alergia && 
+                                   a.Nombre_Alergia.toLowerCase() === valor.toLowerCase());
+        if (alergia) {
+          console.log(`Alergia encontrada: ${alergia.Nombre_Alergia} (ID: ${alergia.ID_Alergias})`);
+          return alergia.ID_Alergias;
+        }
+        
+        // Si no existe y no es "otro", crear un nuevo registro
+        console.log(`Alergia "${valor}" no encontrada en el catálogo, creando nueva entrada`);
+        try {
+          const nuevaAlergia = await window.apiService.catalogos.createAlergia(valor);
+          console.log(`Nueva alergia creada: ${nuevaAlergia.Nombre_Alergia} (ID: ${nuevaAlergia.ID_Alergias})`);
+          return nuevaAlergia.ID_Alergias;
+        } catch (error) {
+          console.error('Error al crear nueva alergia:', error);
+        }
+        break;
+        
+      case 'operaciones':
+        catalogo = await window.apiService.catalogos.getOperaciones();
+        
+        // Si seleccionó "otro", no buscamos en el catálogo
+        if (valor === 'otro') {
+          console.log('Se seleccionó "otro" para operaciones, se procesará el valor personalizado');
+          return null;
+        }
+        
+        // Buscar por nombre
+        const operacion = catalogo.find(o => o && o.Nombre_Operacion && 
+                                     o.Nombre_Operacion.toLowerCase() === valor.toLowerCase());
+        if (operacion) {
+          console.log(`Operación encontrada: ${operacion.Nombre_Operacion} (ID: ${operacion.ID_Operaciones})`);
+          return operacion.ID_Operaciones;
+        }
+        
+        // Si no existe y no es "otro", crear un nuevo registro
+        console.log(`Operación "${valor}" no encontrada en el catálogo, creando nueva entrada`);
+        try {
+          const nuevaOperacion = await window.apiService.catalogos.createOperacion(valor);
+          console.log(`Nueva operación creada: ${nuevaOperacion.Nombre_Operacion} (ID: ${nuevaOperacion.ID_Operaciones})`);
+          return nuevaOperacion.ID_Operaciones;
+        } catch (error) {
+          console.error('Error al crear nueva operación:', error);
+        }
+        break;
+        
+      case 'padecimientos':
+        catalogo = await window.apiService.catalogos.getPadecimientos();
+        
+        // Si seleccionó "otro", no buscamos en el catálogo
+        if (valor === 'otro') {
+          console.log('Se seleccionó "otro" para padecimientos, se procesará el valor personalizado');
+          return null;
+        }
+        
+        // Buscar por nombre
+        const padecimiento = catalogo.find(p => p && p.Nombre_Padecimiento && 
+                                       p.Nombre_Padecimiento.toLowerCase() === valor.toLowerCase());
+        if (padecimiento) {
+          console.log(`Padecimiento encontrado: ${padecimiento.Nombre_Padecimiento} (ID: ${padecimiento.ID_Padecimientos})`);
+          return padecimiento.ID_Padecimientos;
+        }
+        
+        // Si no existe y no es "otro", crear un nuevo registro
+        console.log(`Padecimiento "${valor}" no encontrado en el catálogo, creando nueva entrada`);
+        try {
+          const nuevoPadecimiento = await window.apiService.catalogos.createPadecimiento(valor);
+          console.log(`Nuevo padecimiento creado: ${nuevoPadecimiento.Nombre_Padecimiento} (ID: ${nuevoPadecimiento.ID_Padecimientos})`);
+          return nuevoPadecimiento.ID_Padecimientos;
+        } catch (error) {
+          console.error('Error al crear nuevo padecimiento:', error);
+        }
+        break;
     }
+    
+    console.warn(`No se pudo obtener/crear ID para ${valor} en ${tipoCatalogo}`);
+    return null;
+    
+  } catch (error) {
+    console.error(`Error al obtener ID para ${valor} en ${tipoCatalogo}:`, error);
+    return null;
   }
-  
-  // Padecimientos
-  if (tipoCatalogo === 'padecimientos') {
-    switch (valor.toLowerCase()) {
-      case 'diabetes': return 1;
-      case 'hipertension': return 2;
-      case 'asma': return 3;
-      case 'otro': return 99;
-      default: return 99; // Valor para "otro"
-    }
-  }
-  
-  return null;
 }
 
-function obtenerNombreCatalogo(id, tipoCatalogo) {
-  if (!id) return 'ninguna';
-  
-  // Alergias
-  if (tipoCatalogo === 'alergias') {
-    switch (id) {
-      case 1: return 'penicilina';
-      case 2: return 'polen';
-      case 3: return 'mariscos';
-      case 99: return 'otro';
-      default: return 'otro';
-    }
+// Versión mejorada para obtener nombres desde el catálogo dinámico
+async function obtenerNombreCatalogo(id, tipoCatalogo) {
+  if (!id) {
+    console.log(`ID vacío para ${tipoCatalogo}, retornando 'ninguna'`);
+    return 'ninguna';
   }
   
-  // Operaciones
-  if (tipoCatalogo === 'operaciones') {
-    switch (id) {
-      case 1: return 'cesarea';
-      case 2: return 'apendicectomia';
-      case 3: return 'bypass';
-      case 99: return 'otro';
-      default: return 'otro';
+  try {
+    let catalogo = [];
+    
+    // Obtener el catálogo correspondiente
+    switch (tipoCatalogo) {
+      case 'alergias':
+        catalogo = await window.apiService.catalogos.getAlergias();
+        // Buscar por ID
+        const alergia = catalogo.find(a => a && a.ID_Alergias === id);
+        if (alergia && alergia.Nombre_Alergia) {
+          console.log(`Alergia con ID ${id} encontrada: ${alergia.Nombre_Alergia}`);
+          return alergia.Nombre_Alergia.toLowerCase();
+        }
+        break;
+        
+      case 'operaciones':
+        catalogo = await window.apiService.catalogos.getOperaciones();
+        // Buscar por ID
+        const operacion = catalogo.find(o => o && o.ID_Operaciones === id);
+        if (operacion && operacion.Nombre_Operacion) {
+          console.log(`Operación con ID ${id} encontrada: ${operacion.Nombre_Operacion}`);
+          return operacion.Nombre_Operacion.toLowerCase();
+        }
+        break;
+        
+      case 'padecimientos':
+        catalogo = await window.apiService.catalogos.getPadecimientos();
+        // Buscar por ID
+        const padecimiento = catalogo.find(p => p && p.ID_Padecimientos === id);
+        if (padecimiento && padecimiento.Nombre_Padecimiento) {
+          console.log(`Padecimiento con ID ${id} encontrado: ${padecimiento.Nombre_Padecimiento}`);
+          return padecimiento.Nombre_Padecimiento.toLowerCase();
+        }
+        break;
     }
+    
+    // Si no se encuentra el ID en el catálogo, devolver 'ninguna'
+    console.warn(`No se encontró el valor con ID ${id} en ${tipoCatalogo}, retornando 'ninguna'`);
+    return 'ninguna';
+    
+  } catch (error) {
+    console.error(`Error al obtener nombre para ID ${id} en ${tipoCatalogo}:`, error);
+    return 'ninguna';
   }
-  
-  // Padecimientos
-  if (tipoCatalogo === 'padecimientos') {
-    switch (id) {
-      case 1: return 'diabetes';
-      case 2: return 'hipertension';
-      case 3: return 'asma';
-      case 99: return 'otro';
-      default: return 'otro';
-    }
-  }
-  
-  return 'ninguna';
 }
 
 function mostrarNotificacion(mensaje, tipo = "info") {
@@ -346,90 +699,251 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
     const selectedValue = e.target.value;
     const wrapper = e.target.closest('.alergia-select-wrapper');
     const isLast = e.target === container.querySelectorAll(`.${className}`)[container.querySelectorAll(`.${className}`).length - 1];
-    const selectContainer = wrapper.querySelector('.select-container');    if (selectedValue === 'otro' && !wrapper.querySelector(`.otro${nameAttr}Input`)) {
-      const inputGroup = document.createElement('div'); 
+    const selectContainer = wrapper.querySelector('.select-container');
+    
+    // Limpiar cualquier wrapper vacío o innecesario
+    const allWrappers = container.querySelectorAll('.alergia-select-wrapper');
+    allWrappers.forEach((w, index) => {
+      const select = w.querySelector('select');
+      if (!select || (select.value === 'ninguna' && index > 0)) {
+        w.remove();
+      }
+    });
+      if (selectedValue === 'otro' && !wrapper.querySelector(`.otro${nameAttr}Input`)) {
+      // Crear un contenedor flexible para el input
+      const flexContainer = document.createElement('div');
+      flexContainer.className = 'input-flex-container d-flex align-items-center';
+      flexContainer.style.marginLeft = '10px';
+      
+      const inputGroup = document.createElement('div');
       inputGroup.className = 'input-group';
       
       const input = document.createElement('input');
       input.type = 'text';
       input.name = `otra${nameAttr}[]`;
       input.placeholder = `Especifique otra ${nameAttr.toLowerCase()}`;
-      input.className = `otroAlergiaInput otro${nameAttr}Input`;
+      input.className = `form-control otro${nameAttr}Input`;
+      input.style.minWidth = '200px';
+      input.style.height = '38px'; // Hacer el input de la misma altura que el select
+      
+      // Agregar validación para el campo personalizado
+      input.setAttribute('maxlength', '50');
+      input.setAttribute('pattern', '[A-Za-zÀ-ÖØ-öø-ÿ ]+');
+      input.setAttribute('title', 'Solo se permiten letras y espacios');
+      input.required = true;
       
       inputGroup.appendChild(input);
-      wrapper.appendChild(inputGroup);
-      if (selectContainer) selectContainer.style.flex = "0 0 250px";
-    }
-
-    if (selectedValue !== 'otro') {
+      flexContainer.appendChild(inputGroup);
+      
+      // Insertar el contenedor flex después del select container
+      selectContainer.parentNode.insertBefore(flexContainer, selectContainer.nextSibling);
+      
+      if (selectContainer) {
+        selectContainer.style.flex = "0 0 250px";
+        selectContainer.style.marginRight = "10px";
+      }
+      
+      // Enfocar automáticamente el nuevo campo
+      setTimeout(() => input.focus(), 100);
+    }    if (selectedValue !== 'otro') {
       const input = wrapper.querySelector(`.otro${nameAttr}Input`);
-      if (input) input.remove();
-      if (selectContainer) selectContainer.style.flex = "1";
-    }    if (selectedValue !== 'ninguna' && isLast) {
-      const newWrapper = document.createElement('div');
-      newWrapper.className = 'row alergia-select-wrapper';
-      newWrapper.innerHTML = `
-        <div class="input-group">
-          <div class="input-icon select-container">
-            <iconify-icon icon="${icon}"></iconify-icon>
-            <select name="${nameAttr.toLowerCase()}[]" class="${className}">
-              ${options}
-            </select>
+      if (input) {
+        // Eliminar el contenedor flex completo
+        const flexContainer = input.closest('.input-flex-container');
+        if (flexContainer) {
+          flexContainer.remove();
+        } else {
+          // Fallback: eliminar el grupo del input si no encuentra el contenedor flex
+          const inputGroup = input.closest('.input-group');
+          if (inputGroup) {
+            inputGroup.remove();
+          } else {
+            input.remove();
+          }
+        }
+      }
+      if (selectContainer) {
+        selectContainer.style.flex = "1";
+        selectContainer.style.marginRight = "0";
+      }
+    }
+      if (selectedValue !== 'ninguna' && isLast) {
+      // Verificar si ya existe un wrapper con 'ninguna'
+      const existingWrappers = container.querySelectorAll('.alergia-select-wrapper');
+      let hasEmptySelect = false;
+      
+      existingWrappers.forEach(w => {
+        const select = w.querySelector('select');
+        if (select && select.value === 'ninguna' && w !== wrapper) {
+          hasEmptySelect = true;
+          w.remove();
+        }
+      });
+      
+      if (!hasEmptySelect) {
+        const newWrapper = document.createElement('div');
+        newWrapper.className = 'row alergia-select-wrapper';
+        newWrapper.innerHTML = `
+          <div class="input-group">
+            <div class="input-icon select-container">
+              <iconify-icon icon="${icon}"></iconify-icon>
+              <select name="${nameAttr.toLowerCase()}[]" class="${className}">
+                ${options}
+              </select>
+            </div>
           </div>
-        </div>
-      `;
-      container.appendChild(newWrapper);
+        `;
+        container.appendChild(newWrapper);
+      }
     }
 
+    // Eliminar wrapper actual si se selecciona 'ninguna' y no es el primer select
     const allSelects = container.querySelectorAll(`.${className}`);
     if (selectedValue === 'ninguna' && allSelects.length > 1 && e.target !== allSelects[0]) {
       wrapper.remove();
     }
   });
+  
+  // Cargar opciones dinámicas desde la base de datos
+  loadDynamicOptions(containerId, className, nameAttr);
 }
 
-// Configurar selectores dinámicos
-handleDynamicSelect(
-  'alergiasContainer',
-  'alergiaSelect',
-  'Alergia',
-  'mdi:alert-decagram-outline',
-  `
-    <option value="ninguna">Ninguna</option>
-    <option value="penicilina">Penicilina</option>
-    <option value="polen">Polen</option>
-    <option value="mariscos">Mariscos</option>
-    <option value="otro">Otro</option>
-  `
-);
+// Función para cargar las opciones dinámicamente desde la base de datos
+async function loadDynamicOptions(containerId, className, nameAttr) {
+  try {
+    let catalog = [];
+    let fieldName = '';
+    let idField = '';
+    
+    // Determinar qué catálogo cargar basado en el tipo de selector
+    if (className.includes('alergia')) {
+      catalog = await window.apiService.catalogos.getAlergias();
+      fieldName = 'Nombre_Alergia'; // Corregido mayúsculas
+      idField = 'ID_Alergias';
+    } else if (className.includes('operacion')) {
+      catalog = await window.apiService.catalogos.getOperaciones();
+      fieldName = 'Nombre_Operacion'; // Corregido mayúsculas
+      idField = 'ID_Operaciones';
+    } else if (className.includes('padecimiento')) {
+      catalog = await window.apiService.catalogos.getPadecimientos();
+      fieldName = 'Nombre_Padecimiento'; // Corregido mayúsculas
+      idField = 'ID_Padecimientos';
+    } else {
+      console.warn(`No se reconoce el tipo de selector: ${className}`);
+      return;
+    }
+    
+    // Verificar si se obtuvo el catálogo correctamente
+    if (!catalog || !Array.isArray(catalog)) {
+      console.warn(`No se pudo cargar el catálogo para ${className}`);
+      return;
+    }
+    
+    console.log(`Catálogo cargado para ${className}:`, catalog);
+    
+    // Obtener el primer selector para actualizar sus opciones
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const selectors = container.querySelectorAll(`.${className}`);
+    if (!selectors || selectors.length === 0) return;
+    
+    // Para cada selector, actualizamos sus opciones con los datos del catálogo
+    selectors.forEach(selector => {
+      // Mantener las opciones "ninguna" y "otro" que ya existen
+      let baseOptions = '';
+      for (let option of selector.options) {
+        if (option.value === 'ninguna' || option.value === 'otro') {
+          baseOptions += `<option value="${option.value}">${option.textContent}</option>`;
+        }
+      }
+      
+      // Limpiar el selector y agregar las opciones base
+      selector.innerHTML = baseOptions;
+      
+      // Agregar las opciones desde el catálogo, insertando antes de "otro"
+      const otroOption = selector.querySelector('option[value="otro"]');
+      
+      catalog.forEach(item => {
+        if (item && item[fieldName]) {
+          const option = document.createElement('option');
+          option.value = item[fieldName].toLowerCase();
+          option.textContent = item[fieldName];
+          // Guardar el ID como atributo data- para referencia futura
+          option.setAttribute('data-id', item[idField]);
+          
+          // Insertar la opción antes de "otro"
+          if (otroOption) {
+            selector.insertBefore(option, otroOption);
+          } else {
+            selector.appendChild(option);
+          }
+        }
+      });
+    });
+    
+  } catch (error) {
+    console.error(`Error al cargar opciones dinámicas para ${className}:`, error);
+  }
+}
 
-handleDynamicSelect(
-  'operacionesContainer',
-  'operacionSelect',
-  'Operacion',
-  'mdi:stethoscope',
-  `
-    <option value="ninguna">Ninguna</option>
-    <option value="cesarea">Cesárea</option>
-    <option value="apendicectomia">Apendicectomía</option>
-    <option value="bypass">Bypass gástrico</option>
-    <option value="otro">Otro</option>
-  `
-);
+// Función para configurar los selectores dinámicos
+function setupSelectoresDinamicos() {
+  console.log('Configurando selectores dinámicos');
+  // Configurar selectores dinámicos
+  handleDynamicSelect(
+    'alergiasContainer',
+    'alergiaSelect',
+    'Alergia',
+    'mdi:alert-decagram-outline',
+    `
+      <option value="ninguna">Ninguna</option>
+      <option value="otro">Otro</option>
+    `
+  );
 
-handleDynamicSelect(
-  'padecimientosContainer',
-  'padecimientoSelect',
-  'Padecimiento',
-  'mdi:heart-pulse',
-  `
-    <option value="ninguna">Ninguna</option>
-    <option value="diabetes">Diabetes</option>
-    <option value="hipertension">Hipertensión</option>
-    <option value="asma">Asma</option>
-    <option value="otro">Otro</option>
-  `
-);
+  handleDynamicSelect(
+    'operacionesContainer',
+    'operacionSelect',
+    'Operacion',
+    'mdi:stethoscope',
+    `
+      <option value="ninguna">Ninguna</option>
+      <option value="otro">Otro</option>
+    `
+  );
+
+  handleDynamicSelect(
+    'padecimientosContainer',
+    'padecimientoSelect',
+    'Padecimiento',
+    'mdi:heart-pulse',
+    `
+      <option value="ninguna">Ninguna</option>
+      <option value="otro">Otro</option>
+    `
+  );
+}
+
+// Llamamos a esta función al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize flatpickr
+  const fechaNacimientoInput = document.getElementById('fechaNacimiento');
+  if (fechaNacimientoInput) {
+    flatpickr("#fechaNacimiento", {
+      dateFormat: "Y-m-d",
+      locale: "es",
+      maxDate: "today",
+      monthSelectorType: "static"
+    });
+  }
+  
+  // Configurar el formulario de registro/edición
+  setupFormularioPaciente();
+  
+  // Configurar los selectores dinámicos
+  setupSelectoresDinamicos();
+});
 
 // Exportar la función de editar para que pueda ser usada desde scriptPacientes.js
 window.editarPaciente = editarPaciente;

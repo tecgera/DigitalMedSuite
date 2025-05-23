@@ -131,7 +131,8 @@ const apiService = {
     },
     
     // API service for consultorios
-    consultorios: {        // Get all consultorios
+    consultorios: {
+        // Get all consultorios
         async getAll() {
             try {
                 console.log('Solicitando consultorios al endpoint:', `${apiService.baseUrl}/consultorios`);
@@ -182,7 +183,8 @@ const apiService = {
                 console.error('Error deleting consultorio:', error);
                 throw error;
             }
-        }    },
+        }
+    },
     
     // API endpoints for medicos
     medicos: {
@@ -192,13 +194,51 @@ const apiService = {
         update: async (id, data) => await apiService.put(`Medicos/${id}`, data),
         delete: async (id) => await apiService.delete(`Medicos/${id}`)
     },
-    
-    // API endpoints for catalogos
+      // API endpoints for catalogos
     catalogos: {
         getEstatusCitas: async () => await apiService.get('Catalogos/EstatusCitas'),
         getRoles: async () => await apiService.get('Catalogos/Roles'),
         getEstatusUsuarios: async () => await apiService.get('Catalogos/EstatusUsuarios'),
-        getEspecialidades: async () => await apiService.get('Catalogos/Especialidades')
+        getEspecialidades: async () => await apiService.get('Catalogos/Especialidades'),
+        getAlergias: async () => await apiService.get('Catalogos/Alergias'),
+        getOperaciones: async () => await apiService.get('Catalogos/Operaciones'),
+        getPadecimientos: async () => await apiService.get('Catalogos/Padecimientos'),
+        getTiposSangre: async () => await apiService.get('Catalogos/TiposSangre'),
+        getGeneros: async () => await apiService.get('Catalogos/Generos'),
+        
+        // Métodos para crear nuevos elementos en catálogos
+        createAlergia: async (nombre) => {
+            try {
+                console.log('Intentando crear nueva alergia:', nombre);
+                const data = { Nombre_Alergia: nombre };
+                return await apiService.post('Catalogos/CreateAlergia', data);
+            } catch (error) {
+                console.error('Error al crear nueva alergia:', error);
+                throw error;
+            }
+        },
+        
+        createOperacion: async (nombre) => {
+            try {
+                console.log('Intentando crear nueva operación:', nombre);
+                const data = { Nombre_Operacion: nombre };
+                return await apiService.post('Catalogos/CreateOperacion', data);
+            } catch (error) {
+                console.error('Error al crear nueva operación:', error);
+                throw error;
+            }
+        },
+        
+        createPadecimiento: async (nombre) => {
+            try {
+                console.log('Intentando crear nuevo padecimiento:', nombre);
+                const data = { Nombre_Padecimiento: nombre };
+                return await apiService.post('Catalogos/CreatePadecimiento', data);
+            } catch (error) {
+                console.error('Error al crear nuevo padecimiento:', error);
+                throw error;
+            }
+        }
     },
     
     // Check if the API is accessible and the user is authenticated

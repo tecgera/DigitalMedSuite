@@ -98,6 +98,57 @@ namespace backend.Controllers
         public async Task<ActionResult<IEnumerable<TipoSangre>>> GetTiposSangre()
         {
             return await _context.TiposSangre.ToListAsync();
+        }        // POST: api/Catalogos/CreateAlergia
+        [HttpPost("CreateAlergia")]
+        public async Task<ActionResult<Alergia>> CreateAlergia(Alergia alergia)
+        {
+            // Verificar si ya existe la alergia
+            var existingAlergia = await _context.Alergias
+                .FirstOrDefaultAsync(a => a.Nombre_Alergia.ToLower() == alergia.Nombre_Alergia.ToLower());
+            
+            if (existingAlergia != null)
+            {
+                return Ok(existingAlergia); // Devolver la existente para evitar duplicados
+            }
+
+            _context.Alergias.Add(alergia);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAlergias), new { id = alergia.ID_Alergias }, alergia);
+        }        // POST: api/Catalogos/CreateOperacion
+        [HttpPost("CreateOperacion")]
+        public async Task<ActionResult<Operacion>> CreateOperacion(Operacion operacion)
+        {
+            // Verificar si ya existe la operación
+            var existingOperacion = await _context.Operaciones
+                .FirstOrDefaultAsync(o => o.Nombre_Operacion.ToLower() == operacion.Nombre_Operacion.ToLower());
+            
+            if (existingOperacion != null)
+            {
+                return Ok(existingOperacion); // Devolver la existente para evitar duplicados
+            }
+
+            _context.Operaciones.Add(operacion);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetOperaciones), new { id = operacion.ID_Operaciones }, operacion);
+        }        // POST: api/Catalogos/CreatePadecimiento
+        [HttpPost("CreatePadecimiento")]
+        public async Task<ActionResult<Padecimiento>> CreatePadecimiento(Padecimiento padecimiento)
+        {
+            // Verificar si ya existe el padecimiento
+            var existingPadecimiento = await _context.Padecimientos
+                .FirstOrDefaultAsync(p => p.Nombre_Padecimiento.ToLower() == padecimiento.Nombre_Padecimiento.ToLower());
+            
+            if (existingPadecimiento != null)
+            {
+                return Ok(existingPadecimiento); // Devolver el existente para evitar duplicados
+            }
+
+            _context.Padecimientos.Add(padecimiento);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPadecimientos), new { id = padecimiento.ID_Padecimientos }, padecimiento);
         }
     }
 }

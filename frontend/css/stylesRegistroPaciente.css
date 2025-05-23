@@ -1,0 +1,61 @@
+/* Estilos para el formulario de registro de pacientes */
+
+/* Contenedor flex para los inputs personalizados */
+.input-flex-container {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+}
+
+/* Estilos para el input personalizado */
+.otro-input {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    line-height: 1.5;
+    background-color: #fff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.otro-input:focus {
+    border-color: #8e2de2;
+    box-shadow: 0 0 0 0.2rem rgba(142, 45, 226, 0.25);
+    outline: 0;
+}
+
+/* Estilos para el contenedor del select */
+.select-container {
+    min-width: 200px;
+    margin-right: 10px;
+}
+
+/* Estilos para el wrapper de alergia/operación/padecimiento */
+.alergia-select-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Asegurarse de que los inputs tengan el mismo alto que los selects */
+.form-control {
+    height: 38px !important;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .alergia-select-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .select-container {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .input-flex-container {
+        margin-left: 0 !important;
+    }
+}
