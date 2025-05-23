@@ -67,12 +67,11 @@ const apiBaseUrl = 'http://localhost:5180/api';
 
 // Manejar el envío del formulario de registro
 document.getElementById('submit').addEventListener('click', function() {
-    const usernameInput = document.getElementById('username');
-    const nombreInput = document.getElementById('nombre');
+    const usernameInput = document.getElementById('username');    const nombreInput = document.getElementById('nombre');
     const apellidoPaternoInput = document.getElementById('apellidoPaterno');
     const apellidoMaternoInput = document.getElementById('apellidoMaterno');
     const emailInput = document.getElementById('email');
-    const telefonoInput = document.getElementById('telefono');
+    const telefonoInput = document.getElementById('telefono-registro');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
     const rolIdSelect = document.getElementById('rolId');

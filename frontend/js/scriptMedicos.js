@@ -404,13 +404,13 @@ function mostrarMedicoSeleccionado(medico) {
           ${modoEdicionMedico ?
             `<input type="email" value="${medico.correo || ''}" class="input-edicion" id="edit-correo">` : 
             medico.correo || 'No registrado'}
-        </div>
-      </div>
+        </div>      </div>
       
       <div style="flex: 1 1 240px; min-width: 220px;">
-        <label style="font-weight: bold;">Teléfono:</label>        <div id="campo-telefono" style="border-bottom: 1px solid black; padding: 8px 0;">
+        <label style="font-weight: bold;">Teléfono:</label>
+        <div id="campo-telefono" style="border-bottom: 1px solid black; padding: 8px 0;">
           ${modoEdicionMedico ?
-            `<input type="tel" value="${medico.telefono || ''}" class="input-edicion form-control" id="edit-telefono" pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos" required>` : 
+            `<input type="tel" value="${medico.telefono || ''}" class="input-edicion" id="edit-telefono" pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos" required>` : 
             medico.telefono || 'No registrado'}
         </div>
       </div>
@@ -444,10 +444,9 @@ function mostrarMedicoSeleccionado(medico) {
              </select>` : 
             medico.nombreEstatus || 'No registrado'}
         </div>
-      </div>
-    </div>
+      </div>    </div>
     
-    <div style="border-bottom: 1px solid #dee2e6; width: 100%;"></div>      <div class="actions-container" style="display: flex; justify-content: flex-end; gap: 10px;">
+    <div style="border-bottom: 1px solid #dee2e6; width: 100%;"></div>    <div class="actions-container" style="display: flex; justify-content: flex-end; gap: 10px;">
       ${modoEdicionMedico ? 
         `<button class="btn secondary-btn" onclick="toggleModoEdicion(false)">
           <iconify-icon icon="mdi:close"></iconify-icon>
@@ -455,14 +454,11 @@ function mostrarMedicoSeleccionado(medico) {
         </button>
         <button id="btnGuardarCambiosMedico" class="btn success-btn" onclick="guardarCambiosMedico()">
           <iconify-icon icon="mdi:content-save"></iconify-icon>
-          Guardar Cambios        </button>` :
-        `<button id="btnModificarMedico" class="btn secondary-btn" onclick="toggleModoEdicion(true)" style="display: ${modoEdicionMedico ? 'none' : 'inline-flex'}">
+          Guardar Cambios
+        </button>` :
+        `<button id="btnModificarMedico" class="btn secondary-btn" onclick="toggleModoEdicion(true)">
           <iconify-icon icon="mdi:pencil"></iconify-icon>
           Modificar
-        </button>
-        <button id="btnGuardarCambiosMedico" class="btn success-btn" onclick="guardarCambiosMedico()" style="display: ${modoEdicionMedico ? 'inline-flex' : 'none'}">
-          <iconify-icon icon="mdi:content-save"></iconify-icon>
-          Guardar Cambios
         </button>`
       }
       ${!modoEdicionMedico && esAdminMedico ? 

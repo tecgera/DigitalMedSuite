@@ -604,11 +604,9 @@
           <div class="input-with-icon">
             <iconify-icon icon="mdi:email" class="input-icon"></iconify-icon>
             <input type="email" id="email" placeholder="Correo electrónico" required>
-          </div>
-          
-          <div class="input-with-icon">
+          </div>            <div class="input-with-icon">
             <iconify-icon icon="mdi:phone" class="input-icon"></iconify-icon>
-            <input type="tel" id="telefono" class="form-control" placeholder="Teléfono">
+            <input type="tel" id="telefono-login" placeholder="Teléfono" style="width: 100%; padding: 1rem 1rem 1rem 3.2rem; border-radius: 12px; border: 2px solid var(--border-color); font-size: 1rem; background-color: var(--secondary-color); transition: all 0.3s ease; color: var(--text-primary); font-family: 'Poppins', sans-serif;">
           </div>
           
           <div class="input-with-icon">
@@ -621,12 +619,11 @@
             <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
             <iconify-icon icon="mdi:eye-off" class="toggle-icon" id="toggleIconConfirm" onclick="toggleConfirmPassword()"></iconify-icon>
           </div>
-          
-          <div class="form-group">
+            <div class="form-group">
             <label for="rolId">Tipo de usuario:</label>
             <div class="input-with-icon">
               <iconify-icon icon="mdi:account-cog" class="input-icon"></iconify-icon>
-              <select id="rolId" class="form-control">
+              <select id="rolId">
                 <option value="4">Enfermera</option>
                 <option value="3">Recepcionista</option>
                 <option value="2">Doctor</option>
@@ -805,10 +802,9 @@
           </div>
         </div>
         <div class="input-group">
-          <label>Teléfono</label>
-          <div class="input-icon">
+          <label>Teléfono</label>          <div class="input-icon">
             <iconify-icon icon="mdi:phone"></iconify-icon>
-            <input type="text" id="telefono" name="telefono" placeholder="Teléfono" />
+            <input type="text" id="telefono-registro" name="telefono" placeholder="Teléfono" />
           </div>
         </div>
       </div>
@@ -1000,10 +996,9 @@
       <!-- Contacto -->
       <div class="row">
         <div class="col">
-          <label>Teléfono</label>
-          <div class="input-icon">
+          <label>Teléfono</label>          <div class="input-icon">
             <iconify-icon icon="mdi:phone"></iconify-icon>
-            <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos" />
+            <input type="tel" id="telefono-paciente" name="telefono" placeholder="Teléfono" required pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos" />
           </div>
         </div>
         <div class="col">
