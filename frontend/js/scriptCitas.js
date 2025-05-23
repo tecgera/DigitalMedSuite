@@ -890,10 +890,12 @@
         // Recargar datos y actualizar la interfaz
         await cargarCitasDesdeAPI();
         cargarCitas(filtroActual);
-        
-        // Actualizar el contador de citas expiradas en el dashboard
+          // Actualizar contadores en el dashboard
         if (typeof window.actualizarEstadisticasCitas === 'function') {
           await window.actualizarEstadisticasCitas();
+        }
+        if (typeof window.actualizarContadorCitasHoy === 'function') {
+          await window.actualizarContadorCitasHoy();
         }
         
         // Mostrar notificación con el resumen de cambios

@@ -292,9 +292,15 @@ async function actualizarEstadisticasCitas() {
     const citasExpiradas = citas.filter(cita => cita.ID_Estatus === 5).length;
 
     // Actualizar el número en el dashboard
-    const numCitasNoHonradas = document.querySelector('.stat-card:nth-child(4) .stat-details h3');
-    if (numCitasNoHonradas) {
-      numCitasNoHonradas.textContent = citasExpiradas;
+    const numCitasExpiradasElem = document.querySelector('.stat-card:nth-child(4) .stat-details h3');
+    if (numCitasExpiradasElem) {
+      numCitasExpiradasElem.textContent = citasExpiradas;
+    }
+
+    // Actualizar el texto de las citas expiradas
+    const expiradasProgressElem = document.querySelector('.stat-card:nth-child(4) .stat-progress span');
+    if (expiradasProgressElem) {
+      expiradasProgressElem.textContent = 'Citas expiradas';
     }
   } catch (error) {
     console.error('Error al actualizar estadísticas:', error);
@@ -313,8 +319,40 @@ async function actualizarContadorPacientes() {
     if (numPacientesElement) {
       numPacientesElement.textContent = pacientes.length;
     }
+
+    // Actualizar el texto de total de pacientes
+    const pacientesProgressElem = document.querySelector('.stat-card:first-child .stat-progress span');
+    if (pacientesProgressElem) {
+      pacientesProgressElem.textContent = 'Total registrados';
+    }
   } catch (error) {
     console.error('Error al actualizar contador de pacientes:', error);
+  }
+}
+
+// Actualizar contador de citas
+async function actualizarContadorCitasHoy() {
+  try {
+    // Obtener todas las citas
+    const citas = await window.apiService.citas.getAll();
+    if (!Array.isArray(citas)) return;
+
+    // Contar todas las citas pendientes (status ID 1)
+    const citasPendientes = citas.filter(cita => cita.ID_Estatus === 1).length;
+
+    // Obtener el elemento del contador de citas
+    const numCitasElement = document.querySelector('.stat-card:nth-child(2) .stat-details h3');
+    if (numCitasElement) {
+      numCitasElement.textContent = citasPendientes;
+    }
+
+    // Mostrar el total de citas
+    const totalCitas = citas.length;    const progresoElement = document.querySelector('.stat-card:nth-child(2) .stat-progress span');
+    if (progresoElement) {
+      progresoElement.textContent = `${totalCitas} citas totales`;
+    }
+  } catch (error) {
+    console.error('Error al actualizar contador de citas de hoy:', error);
   }
 }
 
@@ -329,12 +367,13 @@ document.addEventListener('DOMContentLoaded', function () {
     window.location.replace('index.html');
     return;
   }
-    console.log('Autenticación verificada. Actualizando interfaz...');
+  console.log('Autenticación verificada. Actualizando interfaz...');
   updateUserInterface();
   
   // Actualizar estadísticas iniciales
   actualizarEstadisticasCitas();
   actualizarContadorPacientes();
+  actualizarContadorCitasHoy();
 
   const calendarEl = document.getElementById('calendar');
   if (calendarEl) {
@@ -387,4 +426,5 @@ document.addEventListener('DOMContentLoaded', function () {
   cargarCitasHoy();
   actualizarEstadisticasCitas();
   actualizarContadorPacientes();
+  actualizarContadorCitasHoy();
 });
