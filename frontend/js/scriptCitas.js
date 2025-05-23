@@ -188,13 +188,10 @@
             <div class="detail"><strong>Consultorio:</strong> ${cita.consultorio || 'Sin asignar'}</div>
           </div>
         </div>
-      `;
-
-      div.addEventListener('click', () => {
+      `;      div.addEventListener('click', () => {
         seleccionarCita(div, cita);
-        const botonModificar = document.getElementById('btnModificarCita');
+        // El botón Modificar ha sido eliminado, solo verificamos el botón de eliminar
         const botonEliminar = document.getElementById('btnEliminarCita');
-        if (botonModificar) botonModificar.disabled = false;
         if (botonEliminar) botonEliminar.disabled = false;
       });
 

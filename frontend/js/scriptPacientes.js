@@ -106,16 +106,8 @@ function seleccionarPaciente(elemento, datos) {
   elemento.classList.add('seleccionada');
   pacienteSeleccionado = datos;
   mostrarPacienteSeleccionado(datos);
-  
-  // Habilitar el botón de modificar
-  const btnModificar = document.getElementById('btnModificarPaciente');
-  if (btnModificar) {
-    btnModificar.disabled = false;
-    // Agregar evento de modificar si no lo tiene
-    btnModificar.onclick = function() {
-      editarPaciente(pacienteSeleccionado);
-    };
-  }
+    // Ya no es necesario habilitar el botón "Modificar" porque fue eliminado
+  // El botón "Editar" dentro de los detalles del paciente cumple esta función
 }
 
 // ========================
@@ -420,14 +412,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  
-  // Configurar el botón de modificar en el footer
-  const btnModificar = document.getElementById('btnModificarPaciente');
-  if (btnModificar) {
-    btnModificar.addEventListener('click', () => {
-      if (pacienteSeleccionado) {
-        editarPaciente(pacienteSeleccionado);
-      }
-    });
-  }
+    // Ya no es necesario configurar el botón "Modificar" porque fue eliminado
+  // El botón "Editar" dentro de los detalles del paciente cumple esta función
 });
