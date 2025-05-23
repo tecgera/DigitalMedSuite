@@ -191,11 +191,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const formConsultorio = document.getElementById('formConsultorio');
   if (formConsultorio) {
     formConsultorio.addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      const nombreConsultorio = document.getElementById('nombreConsultorio').value.trim();
+      e.preventDefault();      const nombreConsultorio = document.getElementById('nombreConsultorio').value.trim();
       if (!nombreConsultorio) {
         mostrarNotificacion('Por favor ingrese el nombre del consultorio', 'error');
+        return;
+      }
+      
+      if (nombreConsultorio.length > 20) {
+        mostrarNotificacion('El nombre del consultorio no puede exceder los 20 caracteres', 'error');
         return;
       }
 

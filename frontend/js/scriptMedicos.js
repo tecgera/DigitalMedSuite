@@ -372,37 +372,33 @@ function mostrarMedicoSeleccionado(medico) {
     </div>
     <div style="border-bottom: 1px solid #dee2e6; width: 100%;"></div>
     
-    <div id="datosMedico" style="display: flex; flex-wrap: wrap; gap: 20px;">
-      <div style="flex: 1 1 240px; min-width: 220px;">        <label style="font-weight: bold;">Nombre:</label>
+    <div id="datosMedico" style="display: flex; flex-wrap: wrap; gap: 20px;">      <div style="flex: 1 1 240px; min-width: 220px;">        <label style="font-weight: bold;">Nombre:</label>
         <div id="campo-nombre" style="border-bottom: 1px solid black; padding: 8px 0;">
           ${modoEdicionMedico ? 
-            `<input type="text" value="${medico.nombre || ''}" class="input-edicion" id="edit-nombre">` : 
+            `<input type="text" value="${medico.nombre || ''}" class="input-edicion" id="edit-nombre" maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\\s]+" title="Solo se permiten letras (máximo 20 caracteres)" required>` : 
             medico.nombre || 'No registrado'}
         </div>
       </div>
-      
-      <div style="flex: 1 1 240px; min-width: 220px;">
+        <div style="flex: 1 1 240px; min-width: 220px;">
         <label style="font-weight: bold;">Apellido Paterno:</label>
         <div id="campo-apellido-paterno" style="border-bottom: 1px solid black; padding: 8px 0;">
           ${modoEdicionMedico ? 
-            `<input type="text" value="${medico.apellido_Paterno || ''}" class="input-edicion" id="edit-apellido-paterno">` : 
+            `<input type="text" value="${medico.apellido_Paterno || ''}" class="input-edicion" id="edit-apellido-paterno" maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\\s]+" title="Solo se permiten letras (máximo 20 caracteres)" required>` : 
             medico.apellido_Paterno || 'No registrado'}
         </div>
       </div>
-      
-      <div style="flex: 1 1 240px; min-width: 220px;">        <label style="font-weight: bold;">Apellido Materno:</label>
+        <div style="flex: 1 1 240px; min-width: 220px;">        <label style="font-weight: bold;">Apellido Materno:</label>
         <div id="campo-apellido-materno" style="border-bottom: 1px solid black; padding: 8px 0;">
           ${modoEdicionMedico ?
-            `<input type="text" value="${medico.apellido_Materno || ''}" class="input-edicion" id="edit-apellido-materno">` : 
+            `<input type="text" value="${medico.apellido_Materno || ''}" class="input-edicion" id="edit-apellido-materno" maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\\s]+" title="Solo se permiten letras (máximo 20 caracteres)">` : 
             medico.apellido_Materno || 'No registrado'}
         </div>
       </div>
-      
-      <div style="flex: 1 1 240px; min-width: 220px;">
+        <div style="flex: 1 1 240px; min-width: 220px;">
         <label style="font-weight: bold;">Correo:</label>
         <div id="campo-correo" style="border-bottom: 1px solid black; padding: 8px 0;">
           ${modoEdicionMedico ?
-            `<input type="email" value="${medico.correo || ''}" class="input-edicion" id="edit-correo">` : 
+            `<input type="email" value="${medico.correo || ''}" class="input-edicion" id="edit-correo" maxlength="35" required>` : 
             medico.correo || 'No registrado'}
         </div>      </div>
       
@@ -510,18 +506,60 @@ async function guardarCambiosMedico() {
       Guardando...
     `;
     document.getElementById("btnGuardarCambiosMedico").disabled = true;
-    
-    // Obtener datos del formulario
+      // Obtener datos del formulario
     const datosActualizados = {
-      nombre: document.getElementById("edit-nombre").value,
-      apellido_Paterno: document.getElementById("edit-apellido-paterno").value,
-      apellido_Materno: document.getElementById("edit-apellido-materno").value,
-      correo: document.getElementById("edit-correo").value,
-      telefono: document.getElementById("edit-telefono").value,
+      nombre: document.getElementById("edit-nombre").value.trim(),
+      apellido_Paterno: document.getElementById("edit-apellido-paterno").value.trim(),
+      apellido_Materno: document.getElementById("edit-apellido-materno").value.trim(),
+      correo: document.getElementById("edit-correo").value.trim(),
+      telefono: document.getElementById("edit-telefono").value.trim(),
       id_Especialidad: parseInt(document.getElementById("edit-id-especialidad").value) || medicoSeleccionado.id_Especialidad,
-      estado: document.getElementById("edit-estado").value,
+      estado: document.getElementById("edit-estado").value.trim(),
       id_Estatus: parseInt(document.getElementById("edit-id-estatus").value)
     };
+    
+    // Validaciones
+    if (!datosActualizados.nombre) {
+      mostrarNotificacion('Por favor ingrese el nombre del médico', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (!datosActualizados.apellido_Paterno) {
+      mostrarNotificacion('Por favor ingrese el apellido paterno', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (!datosActualizados.correo) {
+      mostrarNotificacion('Por favor ingrese el correo electrónico', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (!validarCorreo(datosActualizados.correo)) {
+      mostrarNotificacion('Por favor ingrese un correo electrónico válido', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (datosActualizados.correo.length > 35) {
+      mostrarNotificacion('El correo electrónico no puede exceder los 35 caracteres', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (!datosActualizados.telefono) {
+      mostrarNotificacion('Por favor ingrese el teléfono', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (!validarTelefono(datosActualizados.telefono)) {
+      mostrarNotificacion('El teléfono debe contener exactamente 10 dígitos numéricos', 'error');
+      resetBtnGuardar();
+      return;
+    }
+    if (!validarSoloLetras(datosActualizados.nombre) || !validarSoloLetras(datosActualizados.apellido_Paterno) || 
+        (datosActualizados.apellido_Materno && !validarSoloLetras(datosActualizados.apellido_Materno))) {
+      mostrarNotificacion('Los nombres y apellidos solo pueden contener letras', 'error');
+      resetBtnGuardar();
+      return;
+    }
     
     console.log('Datos a actualizar:', datosActualizados);
     
@@ -742,3 +780,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ========================
+// Funciones de validación
+// ========================
+
+// Función para restaurar el botón de guardar cambios
+function resetBtnGuardar() {
+  document.getElementById("btnGuardarCambiosMedico").innerHTML = `
+    <iconify-icon icon="mdi:content-save"></iconify-icon>
+    Guardar Cambios
+  `;
+  document.getElementById("btnGuardarCambiosMedico").disabled = false;
+}
+
+// Validación de solo letras
+function validarSoloLetras(texto) {
+  const letrasRegex = /^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+$/;
+  return letrasRegex.test(texto);
+}
+
+// Validación de teléfono
+function validarTelefono(telefono) {
+  const telefonoRegex = /^[0-9]{10}$/;
+  return telefonoRegex.test(telefono);
+}
+
+// Validación de correo electrónico
+function validarCorreo(correo) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(correo);
+}

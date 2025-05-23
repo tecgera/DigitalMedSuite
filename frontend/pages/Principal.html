@@ -943,11 +943,10 @@
 
     <form id="formConsultorio" action="#" method="post">
       <div class="row">
-        <div class="col">
-          <label for="nombreConsultorio">Nombre del Consultorio</label>
+        <div class="col">          <label for="nombreConsultorio">Nombre del Consultorio</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:office-building-marker-outline"></iconify-icon>
-            <input type="text" id="nombreConsultorio" name="nombreConsultorio" placeholder="Ej. Consultorio 101" required>
+            <input type="text" id="nombreConsultorio" name="nombreConsultorio" placeholder="Ej. Consultorio 101" required maxlength="20">
           </div>
         </div>
       </div>
@@ -974,38 +973,37 @@
           <label>Nombre(s)</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account"></iconify-icon>
-            <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" required />
+            <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" required maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+" title="Solo se permiten letras (máximo 20 caracteres)" />
           </div>
         </div>
         <div class="col">
           <label>Apellido Paterno</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account-outline"></iconify-icon>
-            <input type="text" id="apellidoP" name="apellidoP" placeholder="Apellido Paterno" required />
+            <input type="text" id="apellidoP" name="apellidoP" placeholder="Apellido Paterno" required maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+" title="Solo se permiten letras (máximo 20 caracteres)" />
           </div>
         </div>
         <div class="col">
           <label>Apellido Materno</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account-outline"></iconify-icon>
-            <input type="text" id="apellidoM" name="apellidoM" placeholder="Apellido Materno" />
+            <input type="text" id="apellidoM" name="apellidoM" placeholder="Apellido Materno" maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+" title="Solo se permiten letras (máximo 20 caracteres)" />
           </div>
         </div>
       </div>
 
       <!-- Contacto -->
       <div class="row">
-        <div class="col">
-          <label>Teléfono</label>          <div class="input-icon">
+        <div class="col">          <label>Teléfono</label>          <div class="input-icon">
             <iconify-icon icon="mdi:phone"></iconify-icon>
-            <input type="tel" id="telefono-paciente" name="telefono" placeholder="Teléfono" required pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos" />
+            <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required maxlength="10" pattern="[0-9]{10}" title="Ingrese un número de teléfono válido de 10 dígitos" />
           </div>
         </div>
         <div class="col">
           <label>Correo Electrónico</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:email-outline"></iconify-icon>
-            <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required />
+            <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required maxlength="35" />
           </div>
         </div>
       </div>

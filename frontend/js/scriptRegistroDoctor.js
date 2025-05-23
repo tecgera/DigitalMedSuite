@@ -86,8 +86,21 @@ document.addEventListener('DOMContentLoaded', function() {
         mostrarNotificacion('Por favor ingrese un correo electrónico válido', 'error');
         return;
       }
+      if (formData.Correo.length > 35) {
+        mostrarNotificacion('El correo electrónico no puede exceder los 35 caracteres', 'error');
+        return;
+      }
       if (!formData.Telefono) {
         mostrarNotificacion('Por favor ingrese el teléfono', 'error');
+        return;
+      }
+      if (!validarTelefono(formData.Telefono)) {
+        mostrarNotificacion('El teléfono debe contener exactamente 10 dígitos numéricos', 'error');
+        return;
+      }
+      if (!validarSoloLetras(formData.Nombre) || !validarSoloLetras(formData.Apellido_Paterno) || 
+          (formData.Apellido_Materno && !validarSoloLetras(formData.Apellido_Materno))) {
+        mostrarNotificacion('Los nombres y apellidos solo pueden contener letras', 'error');
         return;
       }
 
@@ -139,6 +152,18 @@ function obtenerIdEspecialidad(especialidad) {
     'otro': 6
   };
   return especialidades[especialidad] || 1;
+}
+
+// Validaciones adicionales
+
+function validarSoloLetras(texto) {
+  const letrasRegex = /^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+$/;
+  return letrasRegex.test(texto);
+}
+
+function validarTelefono(telefono) {
+  const telefonoRegex = /^[0-9]{10}$/;
+  return telefonoRegex.test(telefono);
 }
 
 function validarCorreo(correo) {
