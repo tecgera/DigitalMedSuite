@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/frontend/css/StylesPrincipal.css">
   <link rel="stylesheet" href="/frontend/css/styles-estados.css">
+  <link rel="stylesheet" href="/frontend/css/stylesBitacora.css">
   
   <style>
     @keyframes fadeIn {
@@ -118,10 +119,6 @@
             <button class="icon-btn theme-toggle-btn" id="themeToggle">
               <iconify-icon icon="mdi:moon-waning-crescent" width="22" id="themeIcon"></iconify-icon>
             </button>
-            <button class="icon-btn notification-btn">
-              <iconify-icon icon="mdi:bell-outline" width="22"></iconify-icon>
-              <span class="badge">3</span>
-            </button>
             <div class="user-profile">
               <img src="https://ui-avatars.com/api/?name=Usuario&background=8e2de2&color=fff" alt="Profile" class="avatar">
               <span class="user-name" id="userName">Dr. Usuario</span>
@@ -156,18 +153,16 @@
               <div class="stat-progress">
                 <span>10 citas totales</span>
               </div>
-            </div>
-
-            <div class="stat-card">
+            </div>            <div class="stat-card" id="expedientes-actualizados">
               <div class="stat-icon records">
                 <iconify-icon icon="mdi:file-document-edit" width="24"></iconify-icon>
               </div>
               <div class="stat-details">
-                <h3>3</h3>
-                <p>Expedientes Actualizados</p>
+                <h3>0</h3>
+                <p>Nuevos Registros Bitacora</p>
               </div>
               <div class="stat-progress">
-                <span>Hoy</span>
+                <span>Cargando...</span>
               </div>
             </div>
 
@@ -252,10 +247,8 @@
                   </button>
                 </div>
               </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="dashboard-card recent-activity">
+            </div>            <!-- Recent Activity -->
+            <div class="dashboard-card recent-activity" id="actividad-reciente">
               <div class="card-header">
                 <h2>
                   <iconify-icon icon="mdi:clock-time-eight" class="card-icon"></iconify-icon>
@@ -264,33 +257,10 @@
               </div>
               <div class="card-content">
                 <ul class="activity-list">
-                  <li class="activity-item">
-                    <div class="activity-icon update">
-                      <iconify-icon icon="mdi:file-document-edit" width="16"></iconify-icon>
-                    </div>
-                    <div class="activity-details">
-                      <p>Actualización de expediente: <strong>Juan Pérez</strong></p>
-                      <span class="activity-time">Hace 35 minutos</span>
-                    </div>
-                  </li>
-                  <li class="activity-item">
-                    <div class="activity-icon appointment">
-                      <iconify-icon icon="mdi:calendar-check" width="16"></iconify-icon>
-                    </div>
-                    <div class="activity-details">
-                      <p>Cita completada: <strong>María González</strong></p>
-                      <span class="activity-time">Hace 2 horas</span>
-                    </div>
-                  </li>
-                  <li class="activity-item">
-                    <div class="activity-icon new">
-                      <iconify-icon icon="mdi:account-plus" width="16"></iconify-icon>
-                    </div>
-                    <div class="activity-details">
-                      <p>Nuevo paciente registrado: <strong>Carlos Ramírez</strong></p>
-                      <span class="activity-time">Hoy, 9:15 AM</span>
-                    </div>
-                  </li>
+                  <div class="loading-state">
+                    <iconify-icon icon="mdi:loading" class="spin" width="32"></iconify-icon>
+                    <p>Cargando actividad reciente...</p>
+                  </div>
                 </ul>
               </div>
               <div class="card-footer">
@@ -458,20 +428,44 @@
         <!--======================-->
         <section id="bitacora" class="page">
           <div class="section-header">
-                <h2>Gestión del Bitácora</h2>
+                <h2>Gestión de la Bitácora</h2>
             <div class="section-actions">
-            <!-- Acciones futuras -->
+              <input type="text" id="buscarBitacora" placeholder="Buscar por usuario...">
+              <button class="btn refresh-btn" id="btnRefrescarBitacora">
+                <iconify-icon icon="mdi:refresh"></iconify-icon>
+                Actualizar
+              </button>
             </div>
           </div>
+
+  <!-- Controles de filtro -->
+  <div class="filtros-container">
+    <div class="filtros-periodo">
+      <span class="filtro-label">Período:</span>
+      <button class="filtro-bitacora activo" data-filtro="todos">Todos</button>
+      <button class="filtro-bitacora" data-filtro="hoy">Hoy</button>
+      <button class="filtro-bitacora" data-filtro="semana">Última semana</button>
+      <button class="filtro-bitacora" data-filtro="mes">Último mes</button>
+    </div>
+    <div class="filtros-tipo">
+      <span class="filtro-label">Tipo de acción:</span>
+      <button class="filtro-tipo-bitacora activo" data-tipo="todos">Todos</button>
+      <button class="filtro-tipo-bitacora" data-tipo="Creación">Creación</button>
+      <button class="filtro-tipo-bitacora" data-tipo="Modificación">Modificación</button>
+      <button class="filtro-tipo-bitacora" data-tipo="Eliminación">Eliminación</button>
+      <button class="filtro-tipo-bitacora" data-tipo="Consulta">Consulta</button>
+      <button class="filtro-tipo-bitacora" data-tipo="Inicio">Sesión</button>
+    </div>
+  </div>
 
   <!-- Contenido dinámico generado por JS -->
   <div class="bitacora-card">
     <div class="card-content">
       <ul class="activity-list" id="listaBitacora">
         <!-- Elementos se insertarán dinámicamente aquí -->
-        <div class="empty-state">
-          <iconify-icon icon="mdi:note-outline" width="48"></iconify-icon>
-          <p>No hay eventos registrados en la bitácora</p>
+        <div class="loading-state">
+          <iconify-icon icon="mdi:loading" class="spin" width="48"></iconify-icon>
+          <p>Cargando registros de bitácora...</p>
         </div>
       </ul>
     </div>
@@ -1022,9 +1016,10 @@
          
 
       </div><!--======================-->
-    </main>  </div>
-  <script src="/frontend/js/authUtils.js"></script>
+    </main>  </div>  <script src="/frontend/js/authUtils.js"></script>
   <script src="/frontend/js/apiService.js"></script>
+  <script src="/frontend/js/bitacoraService.js"></script>
+  <script src="/frontend/js/bitacoraIntegrador.js"></script>
   <!-- Carga primero el script principal que contiene la lógica de autenticación -->  <script src="/frontend/js/scriptPrincipal.js"></script>
   <!-- Luego carga los scripts de funcionalidades específicas -->  <script src="/frontend/js/scriptUsuarios.js"></script>
   <script src="/frontend/js/scriptMedicos.js"></script>

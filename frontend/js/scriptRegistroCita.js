@@ -250,7 +250,38 @@ function configurarFormularioCita() {
       const respuesta = await window.apiService.citas.create(citaData);
       
       console.log("Respuesta del servidor:", respuesta);
-        // Mostrar mensaje de éxito
+      
+      // Registrar en bitácora
+      if (window.BitacoraService) {
+        // Obtener los nombres para un mensaje más descriptivo
+        let nombrePaciente = "";
+        let nombreMedico = "";
+        
+        try {
+          // Intentar obtener nombres para el mensaje de bitácora
+          const pacienteInfo = await window.apiService.pacientes.getById(citaData.id_Paciente);
+          if (pacienteInfo) {
+            nombrePaciente = `${pacienteInfo.Nombre} ${pacienteInfo.Apellido_Paterno}`;
+          }
+          
+          const medicoInfo = await window.apiService.medicos.getById(citaData.id_Medico);
+          if (medicoInfo) {
+            nombreMedico = `${medicoInfo.Nombre} ${medicoInfo.Apellido_Paterno}`;
+          }
+        } catch (error) {
+          console.error("Error al obtener información para bitácora:", error);
+        }
+        
+        // Registrar el evento en la bitácora
+        window.BitacoraService.registrarAccion(
+          window.BitacoraService.ACCION.CREAR,
+          window.BitacoraService.ENTIDAD.CITA,
+          `Se registró nueva cita para ${nombrePaciente || `paciente #${citaData.id_Paciente}`} con ${nombreMedico || `médico #${citaData.id_Medico}`} para el día ${citaData.fecha_Cita} a las ${citaData.hora_Cita}`,
+          respuesta.ID_Cita || respuesta.id_Cita
+        );
+      }
+      
+      // Mostrar mensaje de éxito
       alert('Cita registrada con éxito');
       
       // Limpiar formulario

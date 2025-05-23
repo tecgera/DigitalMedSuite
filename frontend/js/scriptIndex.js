@@ -177,9 +177,18 @@ document.getElementById('submit').addEventListener('click', function() {    cons
             
             // Intentar guardar el token y los datos del usuario
             const authSaved = saveAuthToken(authToken, userData);
-            
-            if (authSaved) {
+              if (authSaved) {
                 console.log('Datos de autenticación guardados correctamente');
+                
+                // Registrar el evento de inicio de sesión en la bitácora
+                if (window.BitacoraService) {
+                    window.BitacoraService.registrarAccion(
+                        window.BitacoraService.ACCION.LOGIN,
+                        window.BitacoraService.ENTIDAD.SISTEMA,
+                        `Inicio de sesión exitoso como ${username} (${rol})`,
+                        id
+                    );
+                }
             } else {
                 console.warn('Advertencia: Problemas al guardar datos de autenticación, pero continuando con la redirección');
             }

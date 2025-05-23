@@ -104,8 +104,25 @@ function getUserData() {
 
 // Cerrar sesión
 function logout() {
+  // Registrar el evento de cierre de sesión en la bitácora
+  if (window.BitacoraService) {
+    try {
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      window.BitacoraService.registrarAccion(
+        window.BitacoraService.ACCION.LOGOUT,
+        window.BitacoraService.ENTIDAD.SISTEMA,
+        `Cierre de sesión de ${userData.username || 'Usuario'} (${userData.rol || 'Rol no especificado'})`,
+        userData.id
+      );
+    } catch (error) {
+      console.error('Error al registrar cierre de sesión en bitácora:', error);
+    }
+  }
+  
+  // Cerrar sesión
   window.authUtils.logout();
-  window.location.href = 'index.html';
+  // Corregimos la ruta a la página de inicio de sesión
+  window.location.replace('index.html');
 }
 
 // Actualizar UI con datos del usuario
@@ -356,6 +373,69 @@ async function actualizarContadorCitasHoy() {
   }
 }
 
+// Función para actualizar el contador de expedientes actualizados
+async function actualizarContadorExpedientesActualizados() {
+  try {
+    // Verificamos que el servicio de bitácora esté disponible
+    if (!window.BitacoraService) {
+      console.error('El servicio de bitácora no está disponible');
+      return;
+    }
+
+    // Obtener eventos de la bitácora con filtros para modificaciones de pacientes
+    const filtros = {
+      accion: 'Modificación', // Tipo de acción
+      entidad: 'Paciente'     // Entidad que fue modificada
+    };
+
+    // Consultar la bitácora con estos filtros
+    const eventos = await window.BitacoraService.obtenerEventosServidor(filtros);
+    
+    // Contar el número de eventos de modificación de pacientes
+    const cantidadModificaciones = Array.isArray(eventos) ? eventos.length : 0;
+    
+    // Actualizar el contador en el dashboard usando el ID específico
+    const tarjetaExpedientes = document.getElementById('expedientes-actualizados');
+    if (tarjetaExpedientes) {
+      const contadorExpedientes = tarjetaExpedientes.querySelector('.stat-details h3');
+      if (contadorExpedientes) {
+        contadorExpedientes.textContent = cantidadModificaciones;
+      }
+      
+      // También podemos actualizar el texto de "Hoy" si queremos ser más precisos
+      const textoActualizados = tarjetaExpedientes.querySelector('.stat-progress span');
+      if (textoActualizados) {
+        // Si hay modificaciones, mostrar mensajes informativos
+        if (cantidadModificaciones > 0) {
+          // Contar modificaciones de hoy
+          const hoy = new Date();
+          hoy.setHours(0, 0, 0, 0);
+          
+          // Filtrar eventos de hoy
+          const eventosDehoy = eventos.filter(evento => {
+            const fechaEvento = new Date(evento.fechaHora);
+            return fechaEvento >= hoy;
+          });
+          
+          const cantidadHoy = eventosDehoy.length;
+          
+          if (cantidadHoy > 0) {
+            textoActualizados.textContent = `${cantidadHoy} hoy`;
+          } else {
+            textoActualizados.textContent = 'En total';
+          }
+        } else {
+          textoActualizados.textContent = 'Ninguno registrado';
+        }
+      }
+    }
+    
+    console.log(`Contador de expedientes actualizados: ${cantidadModificaciones}`);
+  } catch (error) {
+    console.error('Error al actualizar contador de expedientes:', error);
+  }
+}
+
 // Cargar citas al calendario
 async function cargarCitasCalendario() {
   try {
@@ -457,6 +537,112 @@ async function cargarCitasCalendario() {
   }
 }
 
+// Función para cargar la actividad reciente desde la bitácora
+async function cargarActividadReciente() {
+  try {
+    // Verificar que el servicio de bitácora esté disponible
+    if (!window.BitacoraService) {
+      console.error('El servicio de bitácora no está disponible');
+      return;
+    }
+    
+    const actividadList = document.querySelector('.dashboard-card.recent-activity .activity-list');
+    if (!actividadList) {
+      console.error('No se encontró el elemento para mostrar la actividad reciente');
+      return;
+    }
+    
+    // Mostrar carga
+    actividadList.innerHTML = `
+      <div class="loading-state">
+        <iconify-icon icon="mdi:loading" class="spin" width="24"></iconify-icon>
+        <p>Cargando actividad reciente...</p>
+      </div>
+    `;
+    
+    // Obtener los eventos más recientes (limitado a 5)
+    const filtros = {
+      limite: 5  // Limitar a 5 eventos más recientes
+    };
+    
+    const eventos = await window.BitacoraService.obtenerEventosServidor(filtros);
+    
+    if (!Array.isArray(eventos) || eventos.length === 0) {
+      actividadList.innerHTML = `
+        <div class="empty-state">
+          <iconify-icon icon="mdi:information-outline" width="24"></iconify-icon>
+          <p>No hay actividades registradas</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Limpiar la lista
+    actividadList.innerHTML = '';
+    
+    // Mostrar los eventos más recientes
+    eventos.forEach(evento => {
+      // Determinar el tipo e icono según la acción
+      let tipo = 'other';
+      let icono = 'mdi:note-outline';
+      
+      if (evento.accion) {
+        const accion = evento.accion.toLowerCase();
+        
+        if (accion.includes('creación') || accion === 'crear') {
+          tipo = 'new';
+          icono = 'mdi:plus-circle-outline';
+        } else if (accion.includes('modificación') || accion === 'modificar') {
+          tipo = 'update';
+          icono = 'mdi:file-document-edit';
+        } else if (accion.includes('eliminación') || accion === 'eliminar') {
+          tipo = 'delete';
+          icono = 'mdi:delete-outline';
+        } else if (accion.includes('consulta') || accion === 'consultar') {
+          tipo = 'view';
+          icono = 'mdi:eye';
+        } else if (accion.includes('sesión')) {
+          if (accion.includes('inicio')) {
+            tipo = 'login';
+            icono = 'mdi:login';
+          } else {
+            tipo = 'logout';
+            icono = 'mdi:logout';
+          }
+        }
+      }
+      
+      const tiempoRelativo = window.BitacoraService.obtenerTiempoRelativo(evento.fechaHora);
+      
+      const itemHTML = `
+        <li class="activity-item">
+          <div class="activity-icon ${tipo}">
+            <iconify-icon icon="${icono}" width="16"></iconify-icon>
+          </div>
+          <div class="activity-details">
+            <p>${evento.accion} de ${evento.entidad}${evento.detalles ? ': ' + evento.detalles : ''}</p>
+            <span class="activity-time">${tiempoRelativo} - <strong>${evento.usuario || 'Sistema'}</strong></span>
+          </div>
+        </li>
+      `;
+      
+      actividadList.innerHTML += itemHTML;
+    });
+    
+  } catch (error) {
+    console.error('Error al cargar actividad reciente:', error);
+    const actividadList = document.querySelector('.dashboard-card.recent-activity .activity-list');
+    if (actividadList) {
+      actividadList.innerHTML = `
+        <div class="error-state">
+          <iconify-icon icon="mdi:alert" width="24"></iconify-icon>
+          <p>Error al cargar la actividad reciente</p>
+        </div>
+      `;
+    }
+  }
+}
+
 // Inicialización del dashboard
 document.addEventListener('DOMContentLoaded', async function () {
   console.log('DOM cargado - Verificando autenticación...');
@@ -470,11 +656,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   console.log('Autenticación verificada. Actualizando interfaz...');
   updateUserInterface();
-  
-  // Actualizar estadísticas iniciales
+    // Actualizar estadísticas iniciales
   actualizarEstadisticasCitas();
   actualizarContadorPacientes();
   actualizarContadorCitasHoy();
+  actualizarContadorExpedientesActualizados();
+  cargarActividadReciente();
 
   const calendarEl = document.getElementById('calendar');
   if (calendarEl) {
@@ -571,4 +758,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   actualizarEstadisticasCitas();
   actualizarContadorPacientes();
   actualizarContadorCitasHoy();
+  actualizarContadorExpedientesActualizados();
+  cargarActividadReciente();
 });

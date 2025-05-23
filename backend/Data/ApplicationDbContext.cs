@@ -14,9 +14,9 @@ namespace backend.Data
         public DbSet<Usuario> Usuarios { get; set; } = null!;
         public DbSet<Medico> Medicos { get; set; } = null!;
         public DbSet<Paciente> Pacientes { get; set; } = null!;
-        public DbSet<CitaMedica> CitasMedicas { get; set; } = null!;
-        public DbSet<Consultorio> Consultorios { get; set; } = null!;
+        public DbSet<CitaMedica> CitasMedicas { get; set; } = null!;        public DbSet<Consultorio> Consultorios { get; set; } = null!;
         public DbSet<Bitacora> Bitacoras { get; set; } = null!;
+        public DbSet<EventoBitacora> EventosBitacora { get; set; } = null!;
 
         // Entidades de catálogo
         public DbSet<Rol> Roles { get; set; } = null!;

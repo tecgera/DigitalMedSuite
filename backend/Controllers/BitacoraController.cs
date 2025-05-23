@@ -1,7 +1,9 @@
 using backend.Data;
 using backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace backend.Controllers
 {
@@ -78,9 +80,7 @@ namespace backend.Controllers
                 .Where(b => b.Usuario != null && b.Usuario.Contains(usuario))
                 .OrderByDescending(b => b.Fecha_Modificacion)
                 .ToListAsync();
-        }
-
-        // GET: api/Bitacora/Fecha/2023-05-30
+        }        // GET: api/Bitacora/Fecha/2023-05-30
         [HttpGet("Fecha/{fecha}")]
         public async Task<ActionResult<IEnumerable<Bitacora>>> GetBitacoraByFecha(DateTime fecha)
         {
@@ -90,6 +90,90 @@ namespace backend.Controllers
                 .Where(b => b.Fecha_Modificacion.Date == fecha.Date)
                 .OrderByDescending(b => b.Fecha_Modificacion)
                 .ToListAsync();
+        }
+
+        // *** NUEVO SISTEMA DE BITÁCORA CON EVENTOS ***
+
+        // POST: api/Bitacora/RegistrarEvento
+        [HttpPost("RegistrarEvento")]
+        [Authorize]
+        public async Task<ActionResult<EventoBitacora>> RegistrarEvento(EventoBitacora evento)
+        {
+            if (evento == null)
+            {
+                return BadRequest("Datos del evento no proporcionados");
+            }
+
+            // Asignar usuario del token si no está definido
+            if (string.IsNullOrEmpty(evento.Usuario))
+            {
+                evento.Usuario = User.Identity?.Name;
+            }
+
+            // Asignar fecha actual si no está definida
+            if (evento.FechaHora == default)
+            {
+                evento.FechaHora = DateTime.Now;
+            }
+
+            _context.EventosBitacora.Add(evento);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("ObtenerEvento", new { id = evento.ID_Evento }, evento);
+        }
+
+        // GET: api/Bitacora/ObtenerEvento/5
+        [HttpGet("ObtenerEvento/{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<EventoBitacora>> ObtenerEvento(int id)
+        {
+            var evento = await _context.EventosBitacora.FindAsync(id);
+
+            if (evento == null)
+            {
+                return NotFound();
+            }
+
+            return evento;
+        }
+
+        // GET: api/Bitacora/ObtenerEventos
+        [HttpGet("ObtenerEventos")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<EventoBitacora>>> ObtenerEventos(
+            [FromQuery] string? usuario = null,
+            [FromQuery] string? accion = null,
+            [FromQuery] string? entidad = null,
+            [FromQuery] DateTime? fechaDesde = null,
+            [FromQuery] DateTime? fechaHasta = null,
+            [FromQuery] int? limite = 100)
+        {
+            IQueryable<EventoBitacora> query = _context.EventosBitacora;
+
+            // Aplicar filtros si se proporcionan
+            if (!string.IsNullOrEmpty(usuario))
+                query = query.Where(e => e.Usuario != null && e.Usuario.Contains(usuario));
+
+            if (!string.IsNullOrEmpty(accion))
+                query = query.Where(e => e.Accion.Contains(accion));
+
+            if (!string.IsNullOrEmpty(entidad))
+                query = query.Where(e => e.Entidad.Contains(entidad));
+
+            if (fechaDesde.HasValue)
+                query = query.Where(e => e.FechaHora >= fechaDesde.Value);
+
+            if (fechaHasta.HasValue)
+                query = query.Where(e => e.FechaHora <= fechaHasta.Value);
+
+            // Ordenar por fecha descendente (más recientes primero)
+            query = query.OrderByDescending(e => e.FechaHora);
+
+            // Limitar resultados
+            if (limite.HasValue && limite > 0)
+                query = query.Take(limite.Value);
+
+            return await query.ToListAsync();
         }
     }
 }

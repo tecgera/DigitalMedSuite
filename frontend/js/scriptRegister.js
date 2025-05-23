@@ -194,6 +194,16 @@ document.getElementById('submit').addEventListener('click', function() {
                 rol: data.Rol
             };
             
+            // Registrar el evento en la bitácora
+            if (window.BitacoraService) {
+                window.BitacoraService.registrarAccion(
+                    window.BitacoraService.ACCION.CREAR,
+                    window.BitacoraService.ENTIDAD.USUARIO,
+                    `Se registró al usuario ${data.Nombre_Usuario} con rol ${data.Rol}`,
+                    data.ID_Usuario
+                );
+            }
+            
             // Guardar los datos de autenticación si se desea iniciar sesión automáticamente
             // o comentar esta línea si no se desea iniciar sesión automáticamente
             window.authUtils.saveAuth(data.Token, userData);

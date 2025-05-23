@@ -305,10 +305,30 @@ async function guardarPaciente() {
       // Estamos editando un paciente existente
       response = await window.apiService.pacientes.update(pacienteEditando.ID_Paciente, pacienteData);
       mostrarNotificacion('Paciente actualizado correctamente', 'success');
+      
+      // Registrar en bitácora
+      if (window.BitacoraService) {
+        window.BitacoraService.registrarAccion(
+          window.BitacoraService.ACCION.MODIFICAR,
+          window.BitacoraService.ENTIDAD.PACIENTE,
+          `Se actualizaron los datos del paciente ${pacienteData.Nombre} ${pacienteData.Apellido_Paterno}`,
+          pacienteEditando.ID_Paciente
+        );
+      }
     } else {
       // Estamos creando un nuevo paciente
       response = await window.apiService.pacientes.create(pacienteData);
       mostrarNotificacion('Paciente registrado correctamente', 'success');
+      
+      // Registrar en bitácora
+      if (window.BitacoraService) {
+        window.BitacoraService.registrarAccion(
+          window.BitacoraService.ACCION.CREAR,
+          window.BitacoraService.ENTIDAD.PACIENTE,
+          `Se registró nuevo paciente ${pacienteData.Nombre} ${pacienteData.Apellido_Paterno}`,
+          response.ID_Paciente
+        );
+      }
     }
     
     // Resetear el formulario
@@ -320,6 +340,11 @@ async function guardarPaciente() {
     // Actualizar la lista si es necesario
     if (typeof cargarPacientes === 'function') {
       await cargarPacientes();
+    }
+    
+    // Actualizar el contador de expedientes en el dashboard
+    if (typeof actualizarContadorExpedientesActualizados === 'function') {
+      await actualizarContadorExpedientesActualizados();
     }
     
   } catch (error) {

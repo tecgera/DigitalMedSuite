@@ -1,0 +1,201 @@
+/* Estilos para la sección de Bitácora */
+
+/* Filtros */
+.filtros-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: var(--card-bg-color);
+    box-shadow: var(--card-shadow);
+}
+
+.filtros-periodo,
+.filtros-tipo {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filtro-label {
+    font-weight: 500;
+    margin-right: 8px;
+    color: var(--text-secondary);
+    min-width: 80px;
+}
+
+.filtro-bitacora,
+.filtro-tipo-bitacora {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filtro-bitacora:hover,
+.filtro-tipo-bitacora:hover {
+    background-color: var(--hover-color);
+}
+
+.filtro-bitacora.activo,
+.filtro-tipo-bitacora.activo {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Bitácora Card */
+.bitacora-card {
+    background-color: var(--card-bg-color);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.bitacora-card .card-content {
+    padding: 0;
+}
+
+/* Activity List */
+.activity-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.activity-item {
+    display: flex;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.activity-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+/* Colores para tipos de acciones */
+.activity-icon.new {
+    background-color: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+}
+
+.activity-icon.update {
+    background-color: rgba(66, 153, 225, 0.2);
+    color: #4299e1;
+}
+
+.activity-icon.delete {
+    background-color: rgba(237, 100, 166, 0.2);
+    color: #ed64a6;
+}
+
+.activity-icon.view {
+    background-color: rgba(159, 122, 234, 0.2);
+    color: #9f7aea;
+}
+
+.activity-icon.login {
+    background-color: rgba(246, 173, 85, 0.2);
+    color: #f6ad55;
+}
+
+.activity-icon.logout {
+    background-color: rgba(160, 174, 192, 0.2);
+    color: #a0aec0;
+}
+
+.activity-icon.other {
+    background-color: rgba(113, 128, 150, 0.2);
+    color: #718096;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-details p {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.activity-time {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    display: block;
+}
+
+/* Estados */
+.empty-state, .loading-state, .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.empty-state iconify-icon, 
+.loading-state iconify-icon, 
+.error-state iconify-icon {
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+}
+
+.loading-state .spin {
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filtros-periodo, .filtros-tipo {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .activity-details p {
+        font-size: 0.9rem;
+    }
+    
+    .activity-time {
+        font-size: 0.8rem;
+    }
+    
+    .filtro-bitacora, .filtro-tipo-bitacora {
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+}
