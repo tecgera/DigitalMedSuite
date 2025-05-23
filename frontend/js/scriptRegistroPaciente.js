@@ -28,8 +28,8 @@ function setupFormularioPaciente() {
     
     // Validar CURP
     const curpInput = formulario.querySelector('#curp');
-    if (curpInput && curpInput.value && curpInput.value.length > 15) {
-      curpInput.value = curpInput.value.substring(0, 15);
+    if (curpInput && curpInput.value && curpInput.value.length > 18) {
+      curpInput.value = curpInput.value.substring(0, 18);
       alert('La CURP se ha truncado a 15 caracteres máximo');
     }
     

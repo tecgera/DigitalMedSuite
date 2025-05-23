@@ -730,38 +730,36 @@
     <h2>Registro de Paciente</h2>
     <p>Completa el formulario para crear el expediente médico</p>
 
-    <form id="formPaciente">
-      <!-- Nombre completo -->
+    <form id="formPaciente">      <!-- Nombre completo -->
       <div class="row">
         <div class="input-group">
           <label>Nombre(s)</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account"></iconify-icon>
-            <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" required />
+            <input type="text" id="nombre" name="nombre" placeholder="Nombre(s)" required maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+" title="Solo se permiten letras (máximo 20 caracteres)" />
           </div>
         </div>
         <div class="input-group">
           <label>Apellido Paterno</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account"></iconify-icon>
-            <input type="text" id="apellido_paterno" name="apellido_paterno" placeholder="Apellido Paterno" required />
+            <input type="text" id="apellido_paterno" name="apellido_paterno" placeholder="Apellido Paterno" required maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+" title="Solo se permiten letras (máximo 20 caracteres)" />
           </div>
         </div>
         <div class="input-group">
           <label>Apellido Materno</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:account"></iconify-icon>
-            <input type="text" id="apellido_materno" name="apellido_materno" placeholder="Apellido Materno" />
+            <input type="text" id="apellido_materno" name="apellido_materno" placeholder="Apellido Materno" maxlength="20" pattern="[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]+" title="Solo se permiten letras (máximo 20 caracteres)" />
           </div>
         </div>
       </div>
 
       <!-- CURP, fecha nacimiento, género -->
-      <div class="row">
-        <div class="input-group">          <label>CURP</label>
+      <div class="row">        <div class="input-group">          <label>CURP</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:card-account-details"></iconify-icon>
-            <input type="text" id="curp" name="curp" placeholder="CURP (máximo 15 caracteres)" maxlength="15" />
+            <input type="text" id="curp" name="curp" placeholder="CURP (18 caracteres)" maxlength="18" pattern="[A-Za-z0-9]+" title="Solo se permiten letras y números (18 caracteres)" />
           </div>
         </div>
         <div class="input-group">
@@ -800,22 +798,20 @@
             <iconify-icon icon="mdi:scale-bathroom"></iconify-icon>
             <input type="number" id="peso" name="peso" placeholder="Peso" />
           </div>
-        </div>
-        <div class="input-group">
+        </div>        <div class="input-group">
           <label>Teléfono</label>          <div class="input-icon">
             <iconify-icon icon="mdi:phone"></iconify-icon>
-            <input type="text" id="telefono-registro" name="telefono" placeholder="Teléfono" />
+            <input type="tel" id="telefono-registro" name="telefono" placeholder="Teléfono" pattern="[0-9]+" title="Solo se permiten números" />
           </div>
         </div>
       </div>
 
       <!-- Correo -->
-      <div class="row">
-        <div class="input-group">
+      <div class="row">        <div class="input-group">
           <label>Correo Electrónico</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:email-outline"></iconify-icon>
-            <input type="email" id="correo" name="correo" placeholder="Correo electrónico" />
+            <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese una dirección de correo electrónico válida con @" />
           </div>
         </div>
       </div>
@@ -828,19 +824,17 @@
             <iconify-icon icon="mdi:road-variant"></iconify-icon>
             <input type="text" id="calle" name="calle" placeholder="Nombre de la calle" />
           </div>
-        </div>
-        <div class="input-group">
+        </div>        <div class="input-group">
           <label>Número</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:numeric"></iconify-icon>
-            <input type="text" id="num_calle" name="num_calle" placeholder="Ej. 123" />
+            <input type="text" id="num_calle" name="num_calle" placeholder="Ej. 123" maxlength="4" pattern="[0-9]+" title="Solo se permiten números (máximo 4 caracteres)" />
           </div>
-        </div>
-        <div class="input-group">
+        </div>        <div class="input-group">
           <label>Código Postal</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:home-city-outline"></iconify-icon>
-            <input type="text" id="codigo_postal" name="codigo_postal" placeholder="Ej. 22000" />
+            <input type="text" id="codigo_postal" name="codigo_postal" placeholder="Ej. 22000" maxlength="5" minlength="5" pattern="[0-9]{5}" title="El código postal debe tener exactamente 5 dígitos" />
           </div>
         </div>
       </div>
