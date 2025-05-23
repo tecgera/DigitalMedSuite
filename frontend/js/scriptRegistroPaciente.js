@@ -501,41 +501,79 @@ async function configurarSeleccion(className, id, nombreSeleccion) {
     // Seleccionar la opción "otro"
     for (let option of selector.options) {
       if (option.value === 'otro') {
-        option.selected = true;
-        
-        // Crear input para el valor personalizado
-        const wrapper = selector.closest('.alergia-select-wrapper');
-        if (wrapper) {
-          const selectContainer = wrapper.querySelector('.select-container');
-          if (selectContainer) selectContainer.style.flex = "0 0 250px";
-          
-          const nombreCapitalizado = className.replace('Select', '');
-          
-          // Comprobar si ya existe un input para evitar duplicados
-          if (!wrapper.querySelector(`.otro${nombreCapitalizado}Input`)) {
-            const inputGroup = document.createElement('div');
-            inputGroup.className = 'input-group';
+        option.selected = true;          // Crear input para el valor personalizado
+          const wrapper = selector.closest('.alergia-select-wrapper');
+          if (wrapper) {
+            const selectContainer = wrapper.querySelector('.select-container');
+            if (selectContainer) selectContainer.style.flex = "1";
             
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.name = `otra${nombreCapitalizado}[]`;
-            input.value = nombreSeleccion;
-            input.placeholder = `Especifique otra ${nombreCapitalizado.toLowerCase()}`;
-            input.className = `otroAlergiaInput otro${nombreCapitalizado}Input`;
+            const nombreCapitalizado = className.replace('Select', '');
             
-            // Agregar validación
-            input.setAttribute('maxlength', '50');
-            input.setAttribute('pattern', '[A-Za-zÀ-ÖØ-öø-ÿ ]+');
-            input.setAttribute('title', 'Solo se permiten letras y espacios');
-            input.required = true;
-            
-            inputGroup.appendChild(input);
-            wrapper.appendChild(inputGroup);
-          } else {
-            // Si ya existe, actualizar su valor
-            const input = wrapper.querySelector(`.otro${nombreCapitalizado}Input`);
-            if (input) input.value = nombreSeleccion;
-          }
+            // Comprobar si ya existe un input para evitar duplicados
+            if (!wrapper.querySelector(`.otro${nombreCapitalizado}Input`) && 
+                !container.querySelector(`.otro${nombreCapitalizado}Input`)) {
+              // Crear un contenedor flexible para el input en una nueva fila
+              const flexContainer = document.createElement('div');
+              flexContainer.className = 'input-flex-container d-flex align-items-center';
+              flexContainer.style.marginTop = '10px';
+              flexContainer.style.width = '100%';
+              
+              const inputGroup = document.createElement('div');
+              inputGroup.className = 'input-group';
+              
+              // Añadir un label para el campo personalizado
+              const labelElement = document.createElement('label');
+              labelElement.textContent = `Especificar ${nombreCapitalizado}:`;
+              labelElement.style.marginBottom = '6px';
+              labelElement.style.fontWeight = '600';
+              labelElement.style.fontSize = '14px';
+              labelElement.style.color = '#333';
+              
+              const inputIconDiv = document.createElement('div');
+              inputIconDiv.className = 'input-icon';
+              
+              // Determinar qué icono usar basado en el tipo
+              let iconName = 'mdi:alert-decagram-outline'; // Icono por defecto
+              if (nombreCapitalizado.includes('Operacion')) {
+                iconName = 'mdi:stethoscope';
+              } else if (nombreCapitalizado.includes('Padecimiento')) {
+                iconName = 'mdi:heart-pulse';
+              }
+              
+              // Agregar el icono
+              const iconElement = document.createElement('iconify-icon');
+              iconElement.setAttribute('icon', iconName);
+              
+              const input = document.createElement('input');
+              input.type = 'text';
+              input.name = `otra${nombreCapitalizado}[]`;
+              input.value = nombreSeleccion;
+              input.placeholder = `Especifique otra ${nombreCapitalizado.toLowerCase()}`;
+              input.className = `form-control otro${nombreCapitalizado}Input`;
+              input.style.width = '100%';
+              input.style.paddingLeft = '40px'; // Espacio para el icono
+              
+              // Agregar validación
+              input.setAttribute('maxlength', '50');
+              input.setAttribute('pattern', '[A-Za-zÀ-ÖØ-öø-ÿ ]+');
+              input.setAttribute('title', 'Solo se permiten letras y espacios');
+              input.required = true;
+              
+              // Ensamblar la estructura
+              inputIconDiv.appendChild(iconElement);
+              inputIconDiv.appendChild(input);
+              inputGroup.appendChild(labelElement);
+              inputGroup.appendChild(inputIconDiv);
+              flexContainer.appendChild(inputGroup);
+              
+              // Insertar después del wrapper
+              wrapper.parentNode.insertBefore(flexContainer, wrapper.nextSibling);
+            } else {
+              // Si ya existe, actualizar su valor
+              const input = wrapper.querySelector(`.otro${nombreCapitalizado}Input`) || 
+                           container.querySelector(`.otro${nombreCapitalizado}Input`);
+              if (input) input.value = nombreSeleccion;
+            }
         }
         break;
       }
@@ -720,6 +758,12 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
     return;
   }
 
+  // Nos aseguramos que el contenedor tenga una clase para aplicar estilos específicos
+  container.classList.add('dynamic-select-container');
+  
+  // Vamos a añadir un margen superior más grande al contenedor para dar espacio
+  container.style.marginTop = '25px';
+
   container.addEventListener('change', function (e) {
     if (!e.target.classList.contains(className)) return;
 
@@ -727,6 +771,9 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
     const wrapper = e.target.closest('.alergia-select-wrapper');
     const isLast = e.target === container.querySelectorAll(`.${className}`)[container.querySelectorAll(`.${className}`).length - 1];
     const selectContainer = wrapper.querySelector('.select-container');
+    
+    // Nos aseguramos que el wrapper tenga altura suficiente para evitar solapamientos
+    wrapper.style.minHeight = '70px';
     
     // Limpiar cualquier wrapper vacío o innecesario
     const allWrappers = container.querySelectorAll('.alergia-select-wrapper');
@@ -736,22 +783,38 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
         w.remove();
       }
     });
-      if (selectedValue === 'otro' && !wrapper.querySelector(`.otro${nameAttr}Input`)) {
-      // Crear un contenedor flexible para el input
+    if (selectedValue === 'otro' && !wrapper.querySelector(`.otro${nameAttr}Input`)) {
+      // Crear un contenedor flexible para el input en una nueva fila para evitar solapamiento
       const flexContainer = document.createElement('div');
       flexContainer.className = 'input-flex-container d-flex align-items-center';
-      flexContainer.style.marginLeft = '10px';
+      flexContainer.style.marginTop = '10px';
+      flexContainer.style.width = '100%';
       
       const inputGroup = document.createElement('div');
       inputGroup.className = 'input-group';
+      
+      // Añadir un label para el campo personalizado
+      const labelElement = document.createElement('label');
+      labelElement.textContent = `Especificar ${nameAttr}:`;
+      labelElement.style.marginBottom = '6px';
+      labelElement.style.fontWeight = '600';
+      labelElement.style.fontSize = '14px';
+      labelElement.style.color = '#333';
+      
+      const inputIconDiv = document.createElement('div');
+      inputIconDiv.className = 'input-icon';
+      
+      // Agregar el mismo icono que tiene el select
+      const iconElement = document.createElement('iconify-icon');
+      iconElement.setAttribute('icon', icon); // Usamos el icono que se pasa como parámetro
       
       const input = document.createElement('input');
       input.type = 'text';
       input.name = `otra${nameAttr}[]`;
       input.placeholder = `Especifique otra ${nameAttr.toLowerCase()}`;
       input.className = `form-control otro${nameAttr}Input`;
-      input.style.minWidth = '200px';
-      input.style.height = '38px'; // Hacer el input de la misma altura que el select
+      input.style.width = '100%';
+      input.style.paddingLeft = '40px'; // Espacio para el icono
       
       // Agregar validación para el campo personalizado
       input.setAttribute('maxlength', '50');
@@ -759,21 +822,26 @@ function handleDynamicSelect(containerId, className, nameAttr, icon, options) {
       input.setAttribute('title', 'Solo se permiten letras y espacios');
       input.required = true;
       
-      inputGroup.appendChild(input);
+      // Ensamblar la estructura
+      inputIconDiv.appendChild(iconElement);
+      inputIconDiv.appendChild(input);
+      inputGroup.appendChild(labelElement);
+      inputGroup.appendChild(inputIconDiv);
       flexContainer.appendChild(inputGroup);
       
-      // Insertar el contenedor flex después del select container
-      selectContainer.parentNode.insertBefore(flexContainer, selectContainer.nextSibling);
+      // Crear un contenedor separado para el input y añadirlo DESPUÉS del wrapper completo
+      // en lugar de dentro del wrapper
+      wrapper.parentNode.insertBefore(flexContainer, wrapper.nextSibling);
       
       if (selectContainer) {
-        selectContainer.style.flex = "0 0 250px";
-        selectContainer.style.marginRight = "10px";
+        selectContainer.style.flex = "1";
       }
       
       // Enfocar automáticamente el nuevo campo
       setTimeout(() => input.focus(), 100);
     }    if (selectedValue !== 'otro') {
-      const input = wrapper.querySelector(`.otro${nameAttr}Input`);
+      // Buscar el input personalizado en todo el contenedor padre, no solo en el wrapper
+      const input = container.querySelector(`.otro${nameAttr}Input`);
       if (input) {
         // Eliminar el contenedor flex completo
         const flexContainer = input.closest('.input-flex-container');

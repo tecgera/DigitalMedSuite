@@ -2770,6 +2770,7 @@ flex: 1;
   position: relative;
   display: flex;
   align-items: center;
+  margin-top: 19px; /* Añadir margen superior para separar del label */
 }
 
 #registroPacientes .input-icon iconify-icon {
@@ -2778,6 +2779,7 @@ flex: 1;
   font-size: 20px;
   color: #999;
   pointer-events: none;
+  z-index: 1; /* Asegurar que el ícono esté siempre visible */
 }
 
 #registroPacientes .input-icon input,
@@ -2803,11 +2805,20 @@ flex: 1;
 #registroPacientes .alergia-select-wrapper {
   display: flex;
   gap: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px; /* Más espacio entre elementos */
+  margin-top: 10px; /* Espacio adicional arriba */
   flex-wrap: wrap;
+  position: relative; /* Para posicionamiento preciso */
 }
 #registroPacientes .alergia-select-wrapper .input-group {
   flex: 1;
+  min-height: 70px; /* Altura mínima para evitar solapamiento */
+}
+
+/* Asegurar que los contenedores de alergias, operaciones y padecimientos tengan suficiente separación */
+#alergiasContainer, #operacionesContainer, #padecimientosContainer {
+  margin-bottom: 30px;
+  position: relative;
 }
 
 /* Botones */
