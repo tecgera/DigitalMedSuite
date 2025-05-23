@@ -809,6 +809,113 @@
   }
 
   // ========================
+  // Actualizar Citas Expiradas
+  // ========================
+  async function actualizarCitasExpiradas() {
+    console.log('Verificando estado de citas...', new Date().toLocaleString());
+    
+    try {
+      const todasLasCitasActuales = await window.apiService.citas.getAll();
+      console.log('Citas obtenidas:', todasLasCitasActuales);
+      
+      const citasParaActualizar = todasLasCitasActuales.filter(cita => {
+        // Validar que la cita tenga los campos necesarios
+        if (!cita.Fecha_Cita || !cita.Hora_Cita || !cita.ID_Estatus) {
+          console.log('Cita inválida:', cita);
+          return false;
+        }
+
+        // No procesar citas que ya están canceladas (3), expiradas (5) o no asistió (6)
+        if ([3, 5, 6].includes(cita.ID_Estatus)) {
+          return false;
+        }
+
+        try {
+          // Crear objeto de fecha con la hora de la cita
+          const fechaCitaStr = cita.Fecha_Cita.split('T')[0];
+          const [horas, minutos] = cita.Hora_Cita.split(':');
+          const fechaCita = new Date(fechaCitaStr);
+          fechaCita.setHours(parseInt(horas), parseInt(minutos), 0);
+          const ahora = new Date();
+          
+          // Agregar 15 minutos de gracia
+          const tiempoGracia = new Date(fechaCita.getTime() + (15 * 60000));
+
+          // Log para depuración
+          console.log('Analizando cita:', {
+            id: cita.ID_Cita,
+            horaCita: fechaCita.toLocaleString(),
+            horaGracia: tiempoGracia.toLocaleString(),
+            horaActual: ahora.toLocaleString(),
+            estadoActual: cita.ID_Estatus
+          });
+
+          // Si la cita es de hoy
+          if (fechaCita.toDateString() === ahora.toDateString()) {
+            // Marcar como no asistió (6) solo si ya pasó el tiempo de gracia
+            if (ahora > tiempoGracia) {
+              cita.nuevoEstatus = 6; // No asistió
+              console.log(`Cita ${cita.ID_Cita} - No asistió (pasó tiempo de gracia)`);
+              return true;
+            }
+          } 
+          // Si la cita es de días anteriores
+          else if (fechaCita.toDateString() < ahora.toDateString()) {
+            cita.nuevoEstatus = 5; // Expirada
+            console.log(`Cita ${cita.ID_Cita} - Expirada (fecha pasada)`);
+            return true;
+          }
+
+          return false;
+        } catch (error) {
+          console.error('Error al procesar fecha de cita:', error, cita);
+          return false;
+        }
+      });
+
+      if (citasParaActualizar.length > 0) {
+        console.log('Citas por actualizar:', citasParaActualizar);
+        
+        for (const cita of citasParaActualizar) {
+          try {
+            await window.apiService.citas.update(cita.ID_Cita, {
+              ID_Estatus: cita.nuevoEstatus // Usar el estado específico (5 para expirada, 6 para no asistió)
+            });
+            console.log(`Cita ${cita.ID_Cita} actualizada a estado ${cita.nuevoEstatus}`);
+          } catch (error) {
+            console.error(`Error al actualizar cita ${cita.ID_Cita}:`, error);
+          }
+        }
+
+        // Recargar datos y actualizar la interfaz
+        await cargarCitasDesdeAPI();
+        cargarCitas(filtroActual);
+        
+        // Actualizar el contador de citas expiradas en el dashboard
+        if (typeof window.actualizarEstadisticasCitas === 'function') {
+          await window.actualizarEstadisticasCitas();
+        }
+        
+        // Mostrar notificación con el resumen de cambios
+        const citasNoAsistio = citasParaActualizar.filter(c => c.nuevoEstatus === 6).length;
+        const citasExpiradas = citasParaActualizar.filter(c => c.nuevoEstatus === 5).length;
+        
+        let mensaje = '';
+        if (citasNoAsistio > 0) mensaje += `${citasNoAsistio} citas marcadas como 'No asistió'. `;
+        if (citasExpiradas > 0) mensaje += `${citasExpiradas} citas marcadas como 'Expiradas'. `;
+        
+        if (mensaje) {
+          mostrarNotificacion(mensaje.trim(), 'info');
+        }
+      } else {
+        console.log('No hay citas para actualizar');
+      }
+    } catch (error) {
+      console.error('Error en actualización automática:', error);
+    }
+  }
+
+  // ========================
   // Inicialización general
   // ========================
   document.addEventListener('DOMContentLoaded', async function () {

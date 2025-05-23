@@ -281,6 +281,26 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
   }, 5000);
 }
 
+// Actualizar estadísticas del dashboard
+async function actualizarEstadisticasCitas() {
+  try {
+    // Obtener todas las citas
+    const citas = await window.apiService.citas.getAll();
+    if (!Array.isArray(citas)) return;
+
+    // Contar citas expiradas (estatus 5)
+    const citasExpiradas = citas.filter(cita => cita.ID_Estatus === 5).length;
+
+    // Actualizar el número en el dashboard
+    const numCitasNoHonradas = document.querySelector('.stat-card:nth-child(4) .stat-details h3');
+    if (numCitasNoHonradas) {
+      numCitasNoHonradas.textContent = citasExpiradas;
+    }
+  } catch (error) {
+    console.error('Error al actualizar estadísticas:', error);
+  }
+}
+
 // Inicialización del dashboard
 document.addEventListener('DOMContentLoaded', function () {
   console.log('DOM cargado - Verificando autenticación...');
@@ -295,6 +315,9 @@ document.addEventListener('DOMContentLoaded', function () {
   
   console.log('Autenticación verificada. Actualizando interfaz...');
   updateUserInterface();
+  
+  // Actualizar estadísticas iniciales
+  actualizarEstadisticasCitas();
 
   const calendarEl = document.getElementById('calendar');
   if (calendarEl) {
@@ -345,4 +368,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
   setupHospitalTabs();
   cargarCitasHoy();
+  actualizarEstadisticasCitas();
 });
