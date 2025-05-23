@@ -356,8 +356,109 @@ async function actualizarContadorCitasHoy() {
   }
 }
 
+// Cargar citas al calendario
+async function cargarCitasCalendario() {
+  try {
+    // Obtener todas las citas desde la API
+    const citas = await window.apiService.citas.getAll();
+    if (!Array.isArray(citas)) return [];
+
+    // Mapear las citas al formato que espera FullCalendar
+    const citasPromesas = citas.map(async cita => {
+      // Formatear la fecha y hora
+      const fecha = cita.Fecha_Cita.split('T')[0];
+      const hora = cita.Hora_Cita || '00:00:00';
+      const start = `${fecha}T${hora}`;
+
+      // Obtener nombre del paciente
+      let nombrePaciente = 'Paciente no encontrado';
+      try {
+        const paciente = await window.apiService.pacientes.getById(cita.ID_Paciente);
+        if (paciente) {
+          nombrePaciente = `${paciente.Nombre} ${paciente.Apellido_Paterno}`;
+        }
+      } catch (error) {
+        console.error('Error al obtener paciente:', error);
+      }
+
+      // Obtener nombre del médico
+      let nombreMedico = 'Médico no encontrado';
+      try {
+        const medico = await window.apiService.medicos.getById(cita.ID_Medico);
+        if (medico) {
+          nombreMedico = `Dr. ${medico.Nombre} ${medico.Apellido_Paterno}`;
+        }
+      } catch (error) {
+        console.error('Error al obtener médico:', error);
+      }
+
+      // Obtener nombre del consultorio
+      let nombreConsultorio = 'Consultorio no encontrado';
+      try {
+        const consultorio = await window.apiService.consultorios.getById(cita.ID_Consultorio);
+        if (consultorio) {
+          nombreConsultorio = consultorio.Nombre_Consultorio;
+        }
+      } catch (error) {
+        console.error('Error al obtener consultorio:', error);
+      }
+
+      // Determinar el color y texto de estado según el estatus
+      let backgroundColor;
+      let textColor = '#ffffff';
+      let statusText;
+      switch (cita.ID_Estatus) {
+        case 1: // Programada
+          backgroundColor = '#4285f4'; // Azul
+          statusText = 'Programada';
+          break;
+        case 2: // Confirmada
+          backgroundColor = '#0f9d58'; // Verde
+          statusText = 'Confirmada';
+          break;
+        case 3: // Cancelada
+          backgroundColor = '#db4437'; // Rojo
+          statusText = 'Cancelada';
+          break;
+        case 4: // Completada
+          backgroundColor = '#673ab7'; // Morado
+          statusText = 'Completada';
+          break;
+        case 5: // No Asistió
+          backgroundColor = '#ff9800'; // Naranja
+          statusText = 'No Asistió';
+          break;
+        default:
+          backgroundColor = '#757575'; // Gris por defecto
+          statusText = 'Estado desconocido';
+      }
+
+      return {
+        title: `${nombrePaciente} (${statusText})`,
+        start: start,
+        backgroundColor: backgroundColor,
+        borderColor: backgroundColor,
+        textColor: textColor,
+        allDay: false,
+        extendedProps: {
+          idCita: cita.ID_Cita,
+          paciente: nombrePaciente,
+          medico: nombreMedico,
+          consultorio: nombreConsultorio,
+          estatus: statusText
+        }
+      };
+    });
+
+    return await Promise.all(citasPromesas);
+  } catch (error) {
+    console.error('Error al cargar citas para el calendario:', error);
+    return [];
+  }
+}
+
 // Inicialización del dashboard
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   console.log('DOM cargado - Verificando autenticación...');
   console.log('Token actual:', localStorage.getItem('authToken'));
   console.log('User data actual:', localStorage.getItem('userData'));
@@ -377,6 +478,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const calendarEl = document.getElementById('calendar');
   if (calendarEl) {
+    // Cargar las citas primero
+    const events = await cargarCitasCalendario();
+
     const calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       headerToolbar: {
@@ -385,11 +489,51 @@ document.addEventListener('DOMContentLoaded', function () {
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       locale: 'es',
-      events: [],
-      height: '100%'
+      events: events,
+      height: '100%',
+      eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      },
+      eventClick: function(info) {
+        const cita = info.event.extendedProps;
+        // Mostrar información detallada de la cita
+        const contenido = `
+          Cita ID: ${cita.idCita}
+          Paciente: ${cita.paciente}
+          Médico: ${cita.medico}
+          Consultorio: ${cita.consultorio}
+          Estado: ${cita.estatus}
+        `.replace(/^\s+/gm, ''); // Eliminar espacios al inicio de cada línea
+
+        mostrarNotificacion(contenido, 'info');
+      },
+      dateClick: function(info) {
+        // Al hacer clic en una fecha, mostrar el enlace para registrar una nueva cita
+        const fecha = info.dateStr;
+        mostrarNotificacion(
+          `¿Desea agendar una cita para el ${fecha}? Haga clic en "Nueva Cita"`,
+          'info'
+        );
+      }
     });
     calendar.render();
+
+    // Función para actualizar el calendario
+    async function actualizarCalendario() {
+      const nuevosEventos = await cargarCitasCalendario();
+      calendar.removeAllEvents();
+      calendar.addEventSource(nuevosEventos);
+    }
+
+    // Actualizar el calendario cada 5 minutos
+    setInterval(actualizarCalendario, 5 * 60 * 1000);
+
+    // Exponer la función de actualización para uso global
+    window.actualizarCalendario = actualizarCalendario;
   }
+
   // Exponemos las funciones necesarias al objeto window para que estén disponibles a otros scripts
   window.toggleMenu = toggleMenu;
   window.showPage = showPage;
