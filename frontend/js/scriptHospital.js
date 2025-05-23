@@ -19,25 +19,32 @@ async function cargarConsultorios() {
         <iconify-icon icon="mdi:loading" width="48" class="spin"></iconify-icon>
         <p>Cargando consultorios...</p>
       </div>
-    `;
-
-    // Obtener consultorios desde la API
+    `;    // Obtener consultorios desde la API
+    console.log('Llamando a API de consultorios...');
     const response = await window.apiService.consultorios.getAll();
+    console.log('Respuesta de API de consultorios:', response);
     consultorios = response || [];
 
     lista.innerHTML = '';
     const filtrados = filtroActual === 'todos'
       ? consultorios
       : consultorios.filter(c => c.EstatusNombre?.toLowerCase() === filtroActual.toLowerCase());
-
-    if (filtrados.length === 0) {
+    
+    console.log('Consultorios filtrados:', filtrados);    if (filtrados.length === 0) {
+      let mensaje = 'No hay consultorios registrados';
+      if (filtroActual !== 'todos') {
+        mensaje = `No hay consultorios con estatus "${filtroActual}"`;
+      }
+      
       lista.innerHTML = `
         <div class="empty-state">
           <iconify-icon icon="mdi:office-building" width="48"></iconify-icon>
-          <p>No hay consultorios registrados</p>
+          <p>${mensaje}</p>
         </div>`;
       return;
     }
+    
+    console.log(`Mostrando ${filtrados.length} consultorios en la lista`);
 
     filtrados.forEach((consultorio, index) => {
       const div = document.createElement('div');

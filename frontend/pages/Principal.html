@@ -542,8 +542,7 @@
         <iconify-icon icon="healthicons:hospitalized-24px"></iconify-icon>
         Nuevo Consultorio
       </button>
-    </div>
-  </div>
+    </div>    </div>
 
     <div class="filtros-consultorios">
       <button class="filtro-btn activo" data-estatus="todos">Todos</button>
@@ -554,10 +553,7 @@
 
     <!-- Lista de consultorios -->
     <div class="appointments-list" id="listaConsultorios">
-      <div class="empty-state">
-        <iconify-icon icon="mdi:office-building-outline" width="48"></iconify-icon>
-        <p>No hay consultorios registrados</p>
-      </div>
+      <!-- Los consultorios se cargarán dinámicamente con JavaScript -->
     </div>
   </div>
 </section>
@@ -765,11 +761,10 @@
 
       <!-- CURP, fecha nacimiento, género -->
       <div class="row">
-        <div class="input-group">
-          <label>CURP</label>
+        <div class="input-group">          <label>CURP</label>
           <div class="input-icon">
             <iconify-icon icon="mdi:card-account-details"></iconify-icon>
-            <input type="text" id="curp" name="curp" placeholder="CURP" />
+            <input type="text" id="curp" name="curp" placeholder="CURP (máximo 15 caracteres)" maxlength="15" />
           </div>
         </div>
         <div class="input-group">
@@ -1058,11 +1053,11 @@
     </main>  </div>
   <script src="/frontend/js/authUtils.js"></script>
   <script src="/frontend/js/apiService.js"></script>
-  <!-- Carga primero el script principal que contiene la lógica de autenticación -->
-  <script src="/frontend/js/scriptPrincipal.js"></script>
+  <!-- Carga primero el script principal que contiene la lógica de autenticación -->  <script src="/frontend/js/scriptPrincipal.js"></script>
   <!-- Luego carga los scripts de funcionalidades específicas -->  <script src="/frontend/js/scriptUsuarios.js"></script>
   <script src="/frontend/js/scriptMedicos.js"></script>
   <script src="/frontend/js/scriptHospital.js"></script>
+  <script src="/frontend/js/consultoriosSolucion.js"></script>
   <script src="/frontend/js/scriptCitas.js"></script>
   <script src="/frontend/js/scriptBitacora.js"></script>
   <script src="/frontend/js/scriptPacientes.js"></script>

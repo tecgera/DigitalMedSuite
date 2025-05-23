@@ -46,17 +46,15 @@ namespace backend.Models
         public int? ID_Operaciones { get; set; }
         
         public int? ID_Padecimientos { get; set; }
-        
-        public int? ID_Genero { get; set; }
+          public int? ID_Genero { get; set; }
         
         // Varios
         public DateTime Fecha_Registro { get; set; } = DateTime.Now;
         
         public int? ID_Estatus { get; set; }
         
-        [StringLength(15)]
+        [StringLength(18)]
         public string? CURP { get; set; }
-        
         [ForeignKey("ID_Tipo")]
         public TipoSangre? TipoSangre { get; set; }
         

@@ -22,10 +22,17 @@ function setupFormularioPaciente() {
   // Obtener referencia al formulario
   const formulario = document.querySelector('#formPaciente');
   if (!formulario) return;
-  
-  // Configurar evento de submit
+    // Configurar evento de submit
   formulario.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // Validar CURP
+    const curpInput = formulario.querySelector('#curp');
+    if (curpInput && curpInput.value && curpInput.value.length > 15) {
+      curpInput.value = curpInput.value.substring(0, 15);
+      alert('La CURP se ha truncado a 15 caracteres máximo');
+    }
+    
     await guardarPaciente();
   });
   
@@ -54,14 +61,13 @@ async function guardarPaciente() {
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<iconify-icon icon="mdi:loading" class="spin"></iconify-icon> Guardando...';
     }
-    
-    // Recopilar datos del formulario
+      // Recopilar datos del formulario
     const formData = new FormData(document.querySelector('#formPaciente'));
     const pacienteData = {
       Nombre: formData.get('nombre'),
       Apellido_Paterno: formData.get('apellido_paterno'),
       Apellido_Materno: formData.get('apellido_materno'),
-      CURP: formData.get('curp'),
+      CURP: formData.get('curp') ? (formData.get('curp').length > 15 ? formData.get('curp').substring(0, 15) : formData.get('curp')) : null,
       Fecha_Nacimiento: formData.get('fecha_nacimiento'),
       Calle: formData.get('calle'),
       Num_Calle: formData.get('num_calle') ? parseInt(formData.get('num_calle')) : null,

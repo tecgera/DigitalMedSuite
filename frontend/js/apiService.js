@@ -23,8 +23,7 @@ const apiService = {
             throw error;
         }
     },
-    
-    // Generic POST request with authentication
+      // Generic POST request with authentication
     async post(endpoint, data) {
         try {
             const response = await window.authUtils.fetchAuth(`${this.baseUrl}/${endpoint}`, {
@@ -35,13 +34,20 @@ const apiService = {
                 body: JSON.stringify(data),
             });
             if (!response) return null;
+            
+            // Verificar si la respuesta es exitosa antes de intentar parsear JSON
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Error en la respuesta del servidor (${response.status}):`, errorText);
+                throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+            }
+            
             return await response.json();
         } catch (error) {
             console.error('Error in POST request:', error);
             throw error;
         }
-    },
-      // Generic PUT request with authentication
+    },      // Generic PUT request with authentication
     async put(endpoint, data) {
         try {
             const response = await window.authUtils.fetchAuth(`${this.baseUrl}/${endpoint}`, {
@@ -58,13 +64,19 @@ const apiService = {
                 return { success: true };
             }
             
+            // Verificar si la respuesta es exitosa antes de intentar parsear JSON
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Error en la respuesta del servidor (${response.status}):`, errorText);
+                throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+            }
+            
             return await response.json();
         } catch (error) {
             console.error('Error in PUT request:', error);
             throw error;
         }
-    },
-      // Generic DELETE request with authentication
+    },      // Generic DELETE request with authentication
     async delete(endpoint) {
         try {
             const response = await window.authUtils.fetchAuth(`${this.baseUrl}/${endpoint}`, {
@@ -75,6 +87,13 @@ const apiService = {
             // Handle 204 No Content response
             if (response.status === 204) {
                 return { success: true };
+            }
+            
+            // Verificar si la respuesta es exitosa antes de intentar parsear JSON
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`Error en la respuesta del servidor (${response.status}):`, errorText);
+                throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
             }
             
             return await response.json();
@@ -112,11 +131,13 @@ const apiService = {
     },
     
     // API service for consultorios
-    consultorios: {
-        // Get all consultorios
+    consultorios: {        // Get all consultorios
         async getAll() {
             try {
-                return await apiService.get('consultorios');
+                console.log('Solicitando consultorios al endpoint:', `${apiService.baseUrl}/consultorios`);
+                const response = await apiService.get('consultorios');
+                console.log('Respuesta del servidor para consultorios:', response);
+                return response;
             } catch (error) {
                 console.error('Error getting consultorios:', error);
                 throw error;

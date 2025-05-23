@@ -111,40 +111,52 @@ namespace backend.Controllers
             };
 
             return pacienteDTO;
-        }
-
-        // POST: api/Pacientes
+        }        // POST: api/Pacientes
         [HttpPost]
         public async Task<ActionResult<PacienteDTO>> CreatePaciente(PacienteCrearDTO pacienteDTO)
         {
-            var paciente = new Paciente
+            try
             {
-                ID_Paciente = pacienteDTO.ID_Paciente,
-                Nombre = pacienteDTO.Nombre,
-                Apellido_Paterno = pacienteDTO.Apellido_Paterno,
-                Apellido_Materno = pacienteDTO.Apellido_Materno,
-                Fecha_Nacimiento = pacienteDTO.Fecha_Nacimiento,
-                Calle = pacienteDTO.Calle,
-                Codigo_Postal = pacienteDTO.Codigo_Postal,
-                Num_Calle = pacienteDTO.Num_Calle,
-                Correo_Electronico = pacienteDTO.Correo_Electronico,
-                Telefono = pacienteDTO.Telefono,
-                Altura = pacienteDTO.Altura,
-                Peso = pacienteDTO.Peso,
-                ID_Tipo = pacienteDTO.ID_Tipo,
-                ID_Alergias = pacienteDTO.ID_Alergias,
-                ID_Operaciones = pacienteDTO.ID_Operaciones,
-                ID_Padecimientos = pacienteDTO.ID_Padecimientos,
-                ID_Genero = pacienteDTO.ID_Genero,
-                ID_Estatus = pacienteDTO.ID_Estatus,
-                CURP = pacienteDTO.CURP,
-                Fecha_Registro = DateTime.Now
-            };
+                // Validar longitud del CURP
+                if (pacienteDTO.CURP != null && pacienteDTO.CURP.Length > 15)
+                {
+                    // Truncar CURP a 15 caracteres
+                    pacienteDTO.CURP = pacienteDTO.CURP.Substring(0, 15);
+                }
 
-            _context.Pacientes.Add(paciente);
-            await _context.SaveChangesAsync();
+                var paciente = new Paciente
+                {
+                    ID_Paciente = pacienteDTO.ID_Paciente,
+                    Nombre = pacienteDTO.Nombre,
+                    Apellido_Paterno = pacienteDTO.Apellido_Paterno,
+                    Apellido_Materno = pacienteDTO.Apellido_Materno,
+                    Fecha_Nacimiento = pacienteDTO.Fecha_Nacimiento,
+                    Calle = pacienteDTO.Calle,
+                    Codigo_Postal = pacienteDTO.Codigo_Postal,
+                    Num_Calle = pacienteDTO.Num_Calle,
+                    Correo_Electronico = pacienteDTO.Correo_Electronico,
+                    Telefono = pacienteDTO.Telefono,
+                    Altura = pacienteDTO.Altura,
+                    Peso = pacienteDTO.Peso,
+                    ID_Tipo = pacienteDTO.ID_Tipo,
+                    ID_Alergias = pacienteDTO.ID_Alergias,
+                    ID_Operaciones = pacienteDTO.ID_Operaciones,
+                    ID_Padecimientos = pacienteDTO.ID_Padecimientos,
+                    ID_Genero = pacienteDTO.ID_Genero,
+                    ID_Estatus = pacienteDTO.ID_Estatus,
+                    CURP = pacienteDTO.CURP,
+                    Fecha_Registro = DateTime.Now
+                };
 
-            return CreatedAtAction("GetPaciente", new { id = paciente.ID_Paciente }, await GetPaciente(paciente.ID_Paciente));
+                _context.Pacientes.Add(paciente);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetPaciente", new { id = paciente.ID_Paciente }, await GetPaciente(paciente.ID_Paciente));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al crear el paciente", error = ex.Message });
+            }
         }
 
         // PUT: api/Pacientes/5
@@ -205,16 +217,25 @@ namespace backend.Controllers
             
             if (pacienteDTO.ID_Genero.HasValue)
                 paciente.ID_Genero = pacienteDTO.ID_Genero;
-            
-            if (pacienteDTO.ID_Estatus.HasValue)
+              if (pacienteDTO.ID_Estatus.HasValue)
                 paciente.ID_Estatus = pacienteDTO.ID_Estatus;
             
             if (pacienteDTO.CURP != null)
-                paciente.CURP = pacienteDTO.CURP;
-
-            try
+            {
+                // Validar longitud del CURP
+                if (pacienteDTO.CURP.Length > 15)
+                {
+                    // Truncar CURP a 15 caracteres
+                    paciente.CURP = pacienteDTO.CURP.Substring(0, 15);
+                }
+                else
+                {
+                    paciente.CURP = pacienteDTO.CURP;
+                }
+            }try
             {
                 await _context.SaveChangesAsync();
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -227,24 +248,31 @@ namespace backend.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
-        }
-
-        // DELETE: api/Pacientes/5
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al actualizar el paciente", error = ex.Message });
+            }
+        }        // DELETE: api/Pacientes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePaciente(int id)
         {
-            var paciente = await _context.Pacientes.FindAsync(id);
-            if (paciente == null)
+            try
             {
-                return NotFound();
+                var paciente = await _context.Pacientes.FindAsync(id);
+                if (paciente == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Pacientes.Remove(paciente);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            _context.Pacientes.Remove(paciente);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al eliminar el paciente", error = ex.Message });
+            }
         }
 
         private bool PacienteExists(int id)
